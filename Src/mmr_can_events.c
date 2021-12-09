@@ -6,30 +6,30 @@ static const MmrCanEventList *_rxEvents = NULL;
 
 
 static void __handleCanRxInterrupt(CanHandle *hcan);
-static void __invokeAll(const MmrCanEventList *events, MmrCanEvent *event);
-static void __maybeInvoke(const MmrCanEventHandler handler, MmrCanEvent *event);
+static void __invokeAll(const MmrCanEventList *events, const MmrCanMessage *event);
+static void __maybeInvoke(const MmrCanEventHandler handler, const MmrCanMessage *event);
 
 
-void MMR_CAN_InitRxHandlers(const MmrCanEventList *rxEvents) {
+HalStatus MMR_CAN_InitRxHandlers(CanHandle *hcan, const MmrCanEventList *rxEvents) {
   _rxEvents = rxEvents;
+  return HAL_CAN_ActivateNotification(hcan, MMR_CAN_RX_INTERRUPT);
 }
 
 
 static void __handleCanRxInterrupt(CanHandle *hcan) {
-  static CanRxHeader rxHeader = {};
-  static CanRxBuffer rxData = {};
-
-  HAL_CAN_GetRxMessage(hcan, MMR_CAN_RX_FIFO, &rxHeader, rxData);
-
-  MmrCanEvent event = {
-    .senderId = rxHeader.StdId,
-    .message = rxData,
+  static CanRxBuffer buffer = {};
+  static MmrCanMessage event = {
+    .store = buffer,
   };
 
+  MMR_CAN_Receive(hcan, &event);
   __invokeAll(_rxEvents, &event);
 }
 
-static void __invokeAll(const MmrCanEventList *events, MmrCanEvent *event) {
+static void __invokeAll(
+  const MmrCanEventList *events,
+  const MmrCanMessage *event
+) {
   if (!events) {
     return;
   }
@@ -40,7 +40,10 @@ static void __invokeAll(const MmrCanEventList *events, MmrCanEvent *event) {
   }
 }
 
-static always_inline void __maybeInvoke(const MmrCanEventHandler handler, MmrCanEvent *event) {
+static always_inline void __maybeInvoke(
+  const MmrCanEventHandler handler,
+  const MmrCanMessage *event
+) {
   if (handler) {
     handler(event);
   }

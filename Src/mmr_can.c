@@ -1,8 +1,19 @@
 #include "mmr_can.h"
+#include "mmr_can_util.h"
+
+static uint8_t maskIdLower5Bits(CanRxHeader *header);
+
+
+HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan) {
+  return
+    MMR_CAN_FilterConfigDefault(hcan) |
+    HAL_CAN_Start(hcan)
+    ;
+}
 
 
 HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings) {
-  CAN_FilterTypeDef filter = {
+  CanFilter filter = {
     .FilterActivation = settings.enabled
       ? CAN_FILTER_ENABLE
       : CAN_FILTER_DISABLE,
@@ -19,10 +30,12 @@ HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings) {
   return HAL_CAN_ConfigFilter(hcan, &filter);
 }
 
+
 CanFilterMask MMR_CAN_AlignStandardMask(CanFilterMask baseMask) {
   static const uint8_t extendedMaskSurplusBytes = 5;
   return baseMask << extendedMaskSurplusBytes;
 }
+
 
 MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings() {
   return (MmrCanFilterSettings) {
@@ -35,14 +48,14 @@ MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings() {
 }
 
 
-HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
-  CanTxHeader header = {
-    .IDE = CAN_ID_STD,
-    .RTR = CAN_RTR_DATA,
-    .DLC = packet.length,
-    .StdId = packet.remoteId,
-    .TransmitGlobalTime = DISABLE,
-  };
+bool MMR_CAN_IsMultiFrame(CanRxHeader *header) {
+  return maskIdLower5Bits(header) == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
+}
 
-  return HAL_CAN_AddTxMessage(hcan, &header, packet.data, packet.mailbox);
+bool MMR_CAN_IsMultiFrameEnd(CanRxHeader *header) {
+  return maskIdLower5Bits(header) == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
+}
+
+static always_inline uint8_t maskIdLower5Bits(CanRxHeader *header) {
+  return mask(header->ExtId, B8_(0001, 1111));
 }
