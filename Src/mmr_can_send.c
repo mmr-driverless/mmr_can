@@ -15,7 +15,7 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
     .IDE = CAN_ID_EXT,
     .RTR = CAN_RTR_DATA,
     .DLC = packet.length,
-    .ExtId = packet.remoteId << 5,
+    .ExtId = convertTo(uint32_t, packet.header),
     .TransmitGlobalTime = DISABLE,
   };
 

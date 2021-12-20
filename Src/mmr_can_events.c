@@ -10,12 +10,24 @@ static void __invokeAll(const MmrCanEventList *events, const MmrCanMessage *even
 static void __maybeInvoke(const MmrCanEventHandler handler, const MmrCanMessage *event);
 
 
+/**
+ * @brief
+ * Activates the CAN rx interrupts
+ *
+ * When one is fired, the callbacks provided inside the
+ * MmrCanEventList will be invoked
+ */
 HalStatus MMR_CAN_InitRxHandlers(CanHandle *hcan, const MmrCanEventList *rxEvents) {
   _rxEvents = rxEvents;
   return HAL_CAN_ActivateNotification(hcan, MMR_CAN_RX_INTERRUPT);
 }
 
 
+/**
+ * @brief
+ * Stores the message inside a byte buffer,
+ * and then sends it to every registered event handler
+ */
 static void __handleCanRxInterrupt(CanHandle *hcan) {
   static CanRxBuffer buffer = {};
   static MmrCanMessage event = {

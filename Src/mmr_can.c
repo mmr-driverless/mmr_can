@@ -1,9 +1,13 @@
 #include "mmr_can.h"
 #include "mmr_can_util.h"
 
-static uint8_t maskIdLower5Bits(CanRxHeader *header);
 
-
+/**
+ * @brief
+ * Initializes the filter using the values
+ * from MMR_CAN_GetDefaultFilterSettings, and then
+ * starts the CAN
+ */
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan) {
   return
     MMR_CAN_FilterConfigDefault(hcan) |
@@ -31,12 +35,6 @@ HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings) {
 }
 
 
-CanFilterMask MMR_CAN_AlignStandardMask(CanFilterMask baseMask) {
-  static const uint8_t extendedMaskSurplusBytes = 5;
-  return baseMask << extendedMaskSurplusBytes;
-}
-
-
 MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings() {
   return (MmrCanFilterSettings) {
     .enabled = true,
@@ -45,17 +43,4 @@ MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings() {
     .bank = 0,
     .slaveBankStart = 14,
   };
-}
-
-
-bool MMR_CAN_IsMultiFrame(CanRxHeader *header) {
-  return maskIdLower5Bits(header) == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
-}
-
-bool MMR_CAN_IsMultiFrameEnd(CanRxHeader *header) {
-  return maskIdLower5Bits(header) == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END;
-}
-
-static always_inline uint8_t maskIdLower5Bits(CanRxHeader *header) {
-  return mask(header->ExtId, B8_(0001, 1111));
 }

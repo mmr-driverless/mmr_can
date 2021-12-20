@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "mmr_can_includes.h"
+#include "mmr_can_header.h"
 #include "mmr_can_types.h"
 #include "mmr_can_optimize.h"
 #include "mmr_can_binary_literals.h"
@@ -65,29 +66,11 @@ typedef struct {
 
 
 typedef struct {
-  CanId remoteId;
+  MmrCanHeader header;
   CanMailbox *mailbox;
   uint8_t *data;
   uint8_t length;
 } MmrCanPacket;
-
-
-/**
- * @brief
- * These values can be appended to the extended-id
- * portion of the CAN bus message (that is, the lower 5 bits
- * of the standard id)
- * 
- * They are used to check if a message is either standalone
- * or split into multiple frames
- * 
- * Multi-frame messages have a higher priority over normal ones
- */
-typedef enum {
-  MMR_CAN_MESSAGE_TYPE_MULTI_FRAME = B_(0010),
-  MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END = B_(0011),
-  MMR_CAN_MESSAGE_TYPE_NORMAL = B_(1000),
-} MmrCanMessageType;
 
 
 /**
@@ -111,9 +94,5 @@ MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
 
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
-
-
-bool MMR_CAN_IsMultiFrame(CanRxHeader *header);
-bool MMR_CAN_IsMultiFrameEnd(CanRxHeader *header);
 
 #endif /* INC_MMR_CAN_H_ */
