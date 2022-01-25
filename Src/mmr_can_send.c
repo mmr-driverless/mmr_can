@@ -3,57 +3,63 @@
 #include "mmr_can_util.h"
 
 
-static HalStatus sendNormal(CanHandle *hcan, CanTxHeader *header, MmrCanPacket *packet);
-static HalStatus sendMulti(CanHandle *hcan, CanTxHeader *header, MmrCanPacket *packet);
-static HalStatus sendSingleMultiFrame(CanHandle *hcan, CanTxHeader *header, MmrCanPacket *packet, uint8_t *offset);
-static uint8_t computeFramesToSend(MmrCanPacket *packet);
-static uint8_t computeNextMessageLength(MmrCanPacket *packet, uint8_t offset);
+typedef struct {
+  CanHandle *handle;
+  MmrCanPacket *packet;
 
+  struct {
+    CanTxHeader tx;
+    MmrCanHeader mmr;
+  } headers;
+} TransmissionParams;
+
+
+static HalStatus send(TransmissionParams *tp);
+static HalStatus sendNormal(TransmissionParams *tp);
+static HalStatus sendMulti(TransmissionParams *tp);
+static HalStatus sendSingleMultiFrame(TransmissionParams *tp);
+static uint8_t computeFramesToSend(MmrCanPacket *packet);
+static uint8_t computeNextMessageLength(MmrCanPacket *packet);
+static void setMessageType(TransmissionParams *header, MmrCanMessageType type);
+static void syncHeaders(TransmissionParams *tp);
 
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
-  CanTxHeader header = {
-    .IDE = CAN_ID_EXT,
-    .RTR = CAN_RTR_DATA,
-    .DLC = packet.length,
-    .ExtId = convertTo(uint32_t, packet.header),
-    .TransmitGlobalTime = DISABLE,
+  TransmissionParams tp = {
+    .handle = hcan,
+    .packet = &packet,
+    .headers.tx = {
+      .IDE = CAN_ID_EXT,
+      .RTR = CAN_RTR_DATA,
+      .DLC = packet.length,
+      .TransmitGlobalTime = DISABLE,
+    },
   };
+  syncHeaders(&tp);
 
   return packet.length <= MMR_CAN_MAX_DATA_LENGTH
-    ? sendNormal(hcan, &header, &packet)
-    : sendMulti(hcan, &header, &packet);
+    ? sendNormal(&tp)
+    : sendMulti(&tp);
 }
 
 
-static HalStatus sendNormal(
-  CanHandle *hcan,
-  CanTxHeader *header,
-  MmrCanPacket *packet
-) {
-  header->ExtId |= MMR_CAN_MESSAGE_TYPE_NORMAL;
-  return
-    HAL_CAN_AddTxMessage(hcan, header, packet->data, packet->mailbox);
+static HalStatus sendNormal(TransmissionParams *tp) {
+  setMessageType(tp, MMR_CAN_MESSAGE_TYPE_NORMAL);
+  return send(tp);
 }
 
 
-static HalStatus sendMulti(
-  CanHandle *hcan,
-  CanTxHeader *header,
-  MmrCanPacket *packet
-) {
+static HalStatus sendMulti(TransmissionParams *tp) {
   HalStatus status = HAL_OK;
-  uint8_t offset = 0;
-  uint8_t framesToSend = computeFramesToSend(packet);
+  uint8_t framesToSend = computeFramesToSend(tp->packet);
 
-  header->ExtId |= MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
+  setMessageType(tp, MMR_CAN_MESSAGE_TYPE_MULTI_FRAME);
   do {
     bool isLastFrame = framesToSend <= 1;
     if (isLastFrame) {
-      header->ExtId |= MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END;
+      setMessageType(tp, MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END);
     }
 
-    status |=
-      sendSingleMultiFrame(hcan, header, packet, &offset);
+    status |= sendSingleMultiFrame(tp);
   }
   while (framesToSend-- > 1 && status == HAL_OK);
 
@@ -61,19 +67,32 @@ static HalStatus sendMulti(
 }
 
 
-static HalStatus sendSingleMultiFrame(
-  CanHandle *hcan,
-  CanTxHeader *header,
-  MmrCanPacket *packet,
-  uint8_t *offset
-) {
-  uint8_t *dataStart = packet->data + (*offset);
-  uint8_t length = computeNextMessageLength(packet, *offset);
+static HalStatus sendSingleMultiFrame(TransmissionParams *tp) {
+  uint8_t length =
+    computeNextMessageLength(tp->packet);
 
-  header->DLC = length;
-  *offset += length;
+  tp->packet->length -= length;
+  tp->packet->data += length;
+  tp->headers.tx.DLC = length;
 
-  return HAL_CAN_AddTxMessage(hcan, header, dataStart, packet->mailbox);
+  return send(tp);
+}
+
+
+static HalStatus send(TransmissionParams *tp) {
+  syncHeaders(tp);
+
+  return HAL_CAN_AddTxMessage(
+    tp->handle,
+    &tp->headers.tx,
+    tp->packet->data,
+    tp->packet->mailbox
+  );
+}
+
+
+static void syncHeaders(TransmissionParams *tp) {
+  tp->headers.tx.ExtId = *MMR_CAN_HeaderToBits(&tp->headers.mmr);
 }
 
 
@@ -109,22 +128,14 @@ static uint8_t computeFramesToSend(MmrCanPacket *packet) {
 /**
  * @brief 
  * Returns the length for the next message, either
- * 8 bytes or a lower value, keeping the offset into count.
- * 
- * @example
- * Given
- *  - a 17 bytes packet
- *  - an offset starting at 0 and supposedly incrementing
- *    of 8 after each call
- * 
- * Three subsequent calls to this function will return
- *  First call  -> min(17 - 0, 8)  = min(17, 8) = 8 (bytes)
- *  Second call -> min(17 - 8, 8)  = min(9, 8)  = 8 (bytes)
- *  Third call  -> min(17 - 16, 8) = min(1, 8)  = 1 (byte)
+ * 8 bytes or a lower value.
  */
-static uint8_t computeNextMessageLength(MmrCanPacket *packet, uint8_t offset) {
-  uint8_t remainingBytes = packet->length - offset;
+static uint8_t computeNextMessageLength(MmrCanPacket *packet) {
   return min(
-    remainingBytes, MMR_CAN_MAX_DATA_LENGTH
+    packet->length, MMR_CAN_MAX_DATA_LENGTH
   );
+}
+
+static always_inline void setMessageType(TransmissionParams *tp, MmrCanMessageType type) {
+  tp->headers.mmr.messageType = type;
 }

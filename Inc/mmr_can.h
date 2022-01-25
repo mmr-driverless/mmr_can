@@ -78,7 +78,7 @@ typedef struct {
  * Represents a CAN message
  */
 typedef struct {
-  CanId senderId;
+  MmrCanHeader header;
   void *store;
 } MmrCanMessage;
 
