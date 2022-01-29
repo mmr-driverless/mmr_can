@@ -23,6 +23,7 @@ static uint8_t computeNextMessageLength(MmrCanPacket *packet);
 static void setMessageType(TransmissionParams *header, MmrCanMessageType type);
 static void syncHeaders(TransmissionParams *tp);
 
+
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp = {
     .handle = hcan,
