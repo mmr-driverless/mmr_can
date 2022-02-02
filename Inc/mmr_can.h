@@ -95,4 +95,6 @@ MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
 
+HalStatus MMR_CAN_SendSCS(CanHandle *hcan, MmrCanMessageId scsId, CanMailbox *mailbox, CanId senderId);
+
 #endif /* INC_MMR_CAN_H_ */
