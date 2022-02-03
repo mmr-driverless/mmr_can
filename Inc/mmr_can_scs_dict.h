@@ -14,11 +14,11 @@ typedef struct {
   uint32_t delayStart;
 } MmrCanScsDictEntry;
 
-typedef MmrCanScsDictEntry MmrCanScsDictionary[MMR_SCS_DICTIONARY_SIZE];
+typedef MmrCanScsDictEntry MmrCanScsDictionary[MMR_CAN_SCS_DICTIONARY_SIZE];
 typedef void(*MmrCanScsDictAction)(MmrCanScsDictEntry *entry);
 
 
-uint32_t MMR_CAN_ScsDictPut(MmrCanScsDictEntry entry);
+void MMR_CAN_ScsDictPut(MmrCanScsDictEntry entry);
 void MMR_CAN_ScsDictRemove(uint32_t key);
 void MMR_CAN_ScsDictForeach(MmrCanScsDictAction action);
 

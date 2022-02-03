@@ -1,14 +1,14 @@
-#include "mmr_can_scs.h"
+#include "mmr_can_scs_dict.h"
 
 static MmrCanScsDictionary _dictionary;
 
 
-uint32_t MMR_CAN_ScsDictPut(MmrCanScsDictEntry entry) {
-  _dictionary[entry.key % MMR_CAN_SCS_DICTIONARY_SIZE] = entry.delayStart;
+void MMR_CAN_ScsDictPut(MmrCanScsDictEntry entry) {
+  _dictionary[entry.key % MMR_CAN_SCS_DICTIONARY_SIZE] = entry;
 }
 
 void MMR_CAN_ScsDictRemove(uint32_t key) {
-  _dictionary[key] = {};
+  _dictionary[key] = (MmrCanScsDictEntry){};
 }
 
 void MMR_CAN_ScsDictForeach(MmrCanScsDictAction action) {
