@@ -22,7 +22,7 @@ typedef enum {
   MMR_CAN_MESSAGE_ACK = B_(0001),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME = B_(0010),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END = B_(0011),
-  MMR_CAN_MESSAGE_TYPE_NORMAL = B_(1000),
+  MMR_CAN_MESSAGE_TYPE_NORMAL = B_(0100),
 } MmrCanMessageType;
 
 
@@ -40,9 +40,10 @@ typedef enum {
  */
 typedef struct {
   MmrCanMessagePriority priority : 3;
-  MmrCanMessageId messageId : 10;
-  uint32_t senderId : 12;
-  MmrCanMessageType messageType : 4;
+  uint16_t messageId : 10;
+  uint16_t senderId : 10;
+  uint8_t seqNumber : 3;
+  MmrCanMessageType messageType : 3;
 } MmrCanHeader;
 
 
