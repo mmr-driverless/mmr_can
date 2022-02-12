@@ -1,6 +1,7 @@
 #ifndef INC_MMR_CAN_MESSAGE_ID_H_
 #define INC_MMR_CAN_MESSAGE_ID_H_
 
+#include <stdint.h>
 #include <stdbool.h>
 #include "mmr_can_binary_literals.h"
 

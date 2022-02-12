@@ -5,11 +5,6 @@ You can add this library to your project by either cloning it or adding it as a 
 ---
 
 ### Add as a submodule (recommended)
-You can add the library to an existing STM32 project if you've already initialized it with a git repository
-
-To create a git repository, simply run `git init` inside the main project folder<br>
-You will then be able to link it to a remote repository (like github) by running `git remote add origin repo_url`
-
 To **add mmr_can as a submodule**, go into your project folder and run
 ```
 git submodule add https://github.com/mmr-driverless/mmr_can.git Drivers/MMR_CAN
