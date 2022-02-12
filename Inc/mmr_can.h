@@ -8,6 +8,7 @@
 #include "mmr_can_types.h"
 #include "mmr_can_optimize.h"
 #include "mmr_can_binary_literals.h"
+#include "mmr_can_timer_scs.h"
 
 #ifndef MMR_CAN_RX_FIFO
 #define MMR_CAN_RX_FIFO CAN_RX_FIFO0
