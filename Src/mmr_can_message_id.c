@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "mmr_can_message_id.h"
 
 

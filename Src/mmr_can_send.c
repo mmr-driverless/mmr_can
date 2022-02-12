@@ -28,6 +28,7 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp = {
     .handle = hcan,
     .packet = &packet,
+	.headers.mmr = packet.header,
     .headers.tx = {
       .IDE = CAN_ID_EXT,
       .RTR = CAN_RTR_DATA,
@@ -72,11 +73,13 @@ static HalStatus sendSingleMultiFrame(TransmissionParams *tp) {
   uint8_t length =
     computeNextMessageLength(tp->packet);
 
-  tp->packet->length -= length;
-  tp->packet->data += length;
   tp->headers.tx.DLC = length;
+  tp->packet->length -= length;
 
-  return send(tp);
+  HalStatus result = send(tp);
+
+  tp->packet->data += length;
+  return result;
 }
 
 
