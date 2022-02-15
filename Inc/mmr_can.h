@@ -66,6 +66,43 @@ typedef struct {
 } MmrCanFilterSettings;
 
 
+/**
+ * @brief
+ * A packet that can be sent over a CAN
+ * network.
+ *
+ * @example
+ * typedef struct {
+ *   int x;
+ *   int y;
+ * } Point;
+ *
+ * HalStatus send(Point point) {
+ *   static CanMailbox mailbox = 0;
+ *
+ *   MmrCanPacket packet = {
+ *     .header = {
+ *       .priority = MMR_CAN_MESSAGE_PRIORITY_NORMAL,
+ *       .messageId = MMR_CAN_EXAMPLES_POINT,
+ *       .senderId = 0xXXX,
+ *     },
+ *     .mailbox = &mailbox,
+ *     .data = (uint8_t*)&point,
+ *     .length = sizeof(point),
+ *   };
+ *
+ *   return MMR_CAN_Send(&hcan, packet);
+ * }
+ *
+ * int main() {
+ *   Point p = {10, 20};
+ *   if (send(p) != HAL_OK) {
+ *     Error_Handler();
+ *   }
+ *
+ *   // 'p' has been sent.
+ * }
+ */
 typedef struct {
   MmrCanHeader header;
   CanMailbox *mailbox;
@@ -76,7 +113,37 @@ typedef struct {
 
 /**
  * @brief
- * Represents a CAN message
+ * A message received over a CAN network.
+ *
+ * @example
+ * typedef struct {
+ *   int x;
+ *   int y;
+ * } Point;
+ *
+ * HalStatus receive(Point *result) {
+ *   MmrCanMessage message = {
+ *     .store = result,
+ *   };
+ *
+ *   HalStatus result = MMR_CAN_Receive(&hcan, &message);
+ *   bool isAPoint = message.header.messageId == MMR_CAN_EXAMPLES_POINT;
+ *   if (!isAPoint) {
+ *     return HAL_ERROR;
+ *   }
+ *
+ *   return result;
+ * }
+ *
+ * int main() {
+ *   Point p = {};
+ *   if (receive(&p) != HAL_OK) {
+ *     Error_Handler();
+ *   }
+ *
+ *   // here 'p' has been populated and can
+ *   // be used.
+ * }
  */
 typedef struct {
   MmrCanHeader header;

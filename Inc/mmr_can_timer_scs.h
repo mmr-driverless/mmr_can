@@ -41,7 +41,7 @@ typedef struct {
 
 
 /**
- * All time units are to be considered as microseconds ( 1ms )
+ * All time units are to be considered as milliseconds (1ms)
  */
 bool MMR_CAN_ClearTimerSCS(MmrCanMessageId scsId, CanId receiverId);
 bool MMR_CAN_SetTimerSCS(MmrCanMessageId scsId, CanId receiverId, TimerRange currentTime);

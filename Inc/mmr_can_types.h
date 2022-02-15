@@ -8,6 +8,7 @@ typedef uint32_t CanId;
 typedef uint32_t CanMailbox;
 
 /**
+ * @brief
  * A filter mask for the CANbus.
  * It acts like a subnet mask, filtering the ids that
  * do not match it.
@@ -20,12 +21,14 @@ typedef uint32_t CanMailbox;
 typedef uint32_t CanFilterMask;
 
 /**
+ * @brief
  * Stores a value from CAN_filter_FIFO
  * That is, CAN_FILTER_FIFOx
  */
 typedef uint8_t CanFilterFifo;
 
-/** 
+/**
+ * @brief
  * Represents a filter bank.
  * The values must be in the range [0, 27]
  */

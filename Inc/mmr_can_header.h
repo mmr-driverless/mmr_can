@@ -12,11 +12,10 @@
  * portion of the CAN bus message (that is, the lower 5 bits
  * of the standard id)
  * 
- * They are used to check if a message is either standalone
- * or split into multiple frames
+ * They are used to check if a message is either standalone, an
+ * acknowledgement or split into multiple frames
  * 
- * When the priority and id fields are the same, multi-frame
- * messages have a higher priority over normal ones
+ * Constants with lower values have an higher priority.
  */
 typedef enum {
   MMR_CAN_MESSAGE_ACK = B_(0001),
@@ -47,7 +46,20 @@ typedef struct {
 } MmrCanHeader;
 
 
+/**
+ * @brief
+ * Converts an MmrCanHeader to bits.
+ * That is, a 32bits integer with the first
+ * 3 bits set to zero and the remaining 29 containing the
+ * extended id
+ */
 uint32_t *MMR_CAN_HeaderToBits(MmrCanHeader *header);
+
+/**
+ * @brief
+ * Converts a 32bits integer to an MmrCanHeader.
+ * The left-most 3 bits must be of padding.
+ */
 MmrCanHeader *MMR_CAN_HeaderFromBits(uint32_t *bits);
 
 bool MMR_CAN_IsMultiFrame(MmrCanHeader *header);

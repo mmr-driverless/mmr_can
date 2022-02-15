@@ -24,10 +24,34 @@ typedef enum {
 } MmrCanMessageIdType;
 
 
+/**
+ * @brief
+ * Returns the 3 bits representing
+ * the MmrCanMessageIdType.
+ */
 uint8_t MMR_CAN_GetMessageIdType(MmrCanMessageId msgId);
+
+/**
+ * @brief
+ * Returns the 7 bits representing
+ * the message id's subtype.
+ */
 uint8_t MMR_CAN_GetMessageIdSubtype(MmrCanMessageId msgId);
 
+/**
+ * @brief
+ * Tells wether the provided message
+ * is of the given id type.
+ *
+ * E.g. if a message is an SCS.
+ */
 bool MMR_CAN_IsMessageIdOfType(MmrCanMessageId msgId, MmrCanMessageIdType type);
+
+/**
+ * @brief
+ * Tells wether the given message id is
+ * represents an SCS.
+ */
 bool MMR_CAN_IsMessageIdSCS(MmrCanMessageId msgId);
 
 
@@ -50,7 +74,7 @@ enum MmrCanMessageId {
   MMR_CAN_MESSAGE_ID_SCS_AS_READY,
   MMR_CAN_MESSAGE_ID_SCS_AS_DRIVING,
   MMR_CAN_MESSAGE_ID_SCS_AS_OFF,
-  
+
   MMR_CAN_MESSAGE_ID_SCS_AM_MANUAL_DRIVING,
   MMR_CAN_MESSAGE_ID_SCS_AM_ACCELERATION,
   MMR_CAN_MESSAGE_ID_SCS_AM_SKIDPAD,
