@@ -13,7 +13,7 @@ static HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
 static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry);
 
 
-bool MMR_CAN_MaybeHandleACK(MmrCanHeader header) {
+bool MMR_CAN_MaybeHandleAck(MmrCanHeader header) {
   if (header.messageType != MMR_CAN_MESSAGE_TYPE_ACK) {
     return false;
   }
@@ -29,7 +29,7 @@ bool MMR_CAN_MaybeHandleACK(MmrCanHeader header) {
 }
 
 
-HalStatus MMR_CAN_SendSCS(
+HalStatus MMR_CAN_SendScs(
   CanHandle *hcan,
   MmrCanMessageId scsId,
   CanId senderId
