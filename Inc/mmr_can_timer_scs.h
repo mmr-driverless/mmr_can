@@ -4,7 +4,6 @@
 #include "mmr_can_message_id.h"
 #include "mmr_can_types.h"
 
-
 /**
  * Scs_timer represents the max number of counter
  * that need to checked w/current time
@@ -19,25 +18,11 @@
  */
 typedef uint32_t TimerRange;
 
-
-
 typedef struct {
   MmrCanMessageId scsId;
   CanId receiverId;
   TimerRange counter;
 } MmrTimerSCS;
-
-
-/**
- * @brief Represents the base-struct to manage a single RTR
- * and allows to interface with the associated SCS's timer
- */
-typedef struct {
-  MmrCanMessageId scsId;
-  CanId receiverId;
-  int rtr;
-} RTRresponse;
-
 
 
 /**
@@ -54,7 +39,7 @@ bool MMR_CAN_SetTimerSCS(MmrCanMessageId scsId, CanId receiverId, TimerRange cur
  * @param currentTime from __HAL_TIM_GET_COUNTER(&htimX) or directly from the CNT register
  * @param thresholdDelay by rules 500ms
  */
-bool MMR_CAN_GetTimerSCS(RTRresponse *rtrResponse, TimerRange currentTime, TimerRange thresholdDelay);
+bool MMR_CAN_GetTimerSCS(MmrCanMessageId scsId, CanId receiverId, int *rtr, TimerRange currentTime, TimerRange thresholdDelay);
 
 
 #endif // !INC_MMR_CAN_TIMER_SCS_H_

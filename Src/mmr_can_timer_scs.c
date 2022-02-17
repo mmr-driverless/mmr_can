@@ -1,6 +1,6 @@
-#include "mmr_can.h"
+#include "mmr_can_timer_scs.h"
 
-static MmrTimerSCS arr_timer[MMR_SCS_NR_TIMERS] = {};
+static MmrTimerSCS arr_timer[MMR_SCS_NR_TIMERS];
 
 static MmrTimerSCS* findTimer(MmrCanMessageId scsId, CanId receiverId);
 
@@ -17,9 +17,7 @@ void MMR_CAN_InitTimerSCS() {
 
 bool MMR_CAN_ClearTimerSCS(MmrCanMessageId scsId, CanId receiverId) {
   MmrTimerSCS *timer = findTimer(scsId, receiverId);
-  if (timer == NULL) {
-    return false;
-  }
+  if (timer == NULL) return false;
 
   timer->scsId = 0;
   timer->receiverId = 0;
@@ -29,10 +27,8 @@ bool MMR_CAN_ClearTimerSCS(MmrCanMessageId scsId, CanId receiverId) {
 
 
 bool MMR_CAN_SetTimerSCS(MmrCanMessageId scsId, CanId receiverId, TimerRange currentTime) {
-  MmrTimerSCS *timer = findTimer(scsId, receiverId);
-  if (timer == NULL) {
-    return false;
-  }
+  MmrTimerSCS *timer = findTimer(0, 0);
+  if (timer == NULL) return false;
 
   timer->scsId = scsId;
   timer->receiverId = receiverId;
@@ -41,18 +37,12 @@ bool MMR_CAN_SetTimerSCS(MmrCanMessageId scsId, CanId receiverId, TimerRange cur
 }
 
 
-bool MMR_CAN_GetTimerSCS(RTRresponse *rtrResponse, TimerRange currentTime, TimerRange thresholdDelay) {
-  MmrTimerSCS *timer = findTimer(
-    rtrResponse->scsId,
-    rtrResponse->receiverId
-  );
-
-  if (timer == NULL) {
-    return false;
-  }
+bool MMR_CAN_GetTimerSCS(MmrCanMessageId scsId, CanId receiverId, int *rtr, TimerRange currentTime, TimerRange thresholdDelay) {
+  MmrTimerSCS *timer = findTimer(scsId, receiverId);
+  if (timer == NULL) return false;
 
   if (currentTime - timer->counter >= thresholdDelay) {
-    rtrResponse->rtr++;
+    rtr++;
   }
   return true;
 }
@@ -63,7 +53,7 @@ MmrTimerSCS* findTimer(MmrCanMessageId scsId, CanId receiverId) {
   for (; i < MMR_SCS_NR_TIMERS; i++) {
     MmrTimerSCS *timer = arr_timer + i;
 
-    if (timer->scsId == scsId && arr_timer->receiverId == receiverId) {
+    if (timer->scsId == scsId && timer->receiverId == receiverId) {
       return timer;
     }
   }
