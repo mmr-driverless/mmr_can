@@ -8,7 +8,7 @@
 #include "mmr_can_types.h"
 #include "mmr_can_optimize.h"
 #include "mmr_can_binary_literals.h"
-#include "mmr_can_timer_scs.h"
+#include "mmr_can_scs_manager.h"
 
 #ifndef MMR_CAN_RX_FIFO
 #define MMR_CAN_RX_FIFO CAN_RX_FIFO0
@@ -162,7 +162,5 @@ MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
 
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
-
-HalStatus MMR_CAN_SendSCS(CanHandle *hcan, MmrCanMessageId scsId, CanMailbox *mailbox, CanId senderId);
 
 #endif /* INC_MMR_CAN_H_ */

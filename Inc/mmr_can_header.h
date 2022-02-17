@@ -18,7 +18,7 @@
  * Constants with lower values have an higher priority.
  */
 typedef enum {
-  MMR_CAN_MESSAGE_ACK = B_(0001),
+  MMR_CAN_MESSAGE_TYPE_ACK = B_(0001),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME = B_(0010),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END = B_(0011),
   MMR_CAN_MESSAGE_TYPE_NORMAL = B_(0100),

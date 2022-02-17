@@ -1,59 +1,135 @@
 #include "mmr_can_scs_manager.h"
 
-static RTRresponse arr_scs[MMR_SCS_NR_TIMERS];
+static MmrCanScsEntry __scsEntries[MMR_CAN_SCS_ENTRIES_COUNT];
 
-static RTRresponse* findResponse(MmrCanMessageId scsId, CanId receiverId);
+static void maybeIncrementRTR(MmrCanScsEntry *entry);
+
+static MmrCanScsEntry* putEntry(MmrCanHeader header);
+static MmrCanScsEntry* clearEntry(MmrCanHeader header);
+static MmrCanScsEntry* findEntry(MmrCanHeader header);
+
+static TimerRange getCurrentTime();
+static HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
+static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry);
 
 
-bool SetRTRresponse(MmrCanMessageId scsId, CanId receiverId, int rtr)
-{
-    RTRresponse *response = findResponse(0, 0);
-    if (response == NULL) return false;
+bool MMR_CAN_MaybeHandleACK(MmrCanHeader header) {
+  if (header.messageType != MMR_CAN_MESSAGE_TYPE_ACK) {
+    return false;
+  }
 
-    response->scsId = scsId;
-    response->receiverId = receiverId;
-    response->rtr = 0;
+  header.messageType = MMR_CAN_MESSAGE_TYPE_NORMAL;
+  MmrCanScsEntry *entry = findEntry(header);
+  if (entry == NULL) {
+    return false;
+  }
 
-    return MMR_CAN_SetTimerSCS(response->scsId, response->receiverId, MMR_CAN_GetCurrentTime);
-}
-
-void CheckSCS()
-{
-    if (counter>=MMR_SCS_NR_TIMERS) counter=0;
-
-    RTRresponse *_rtrResponse = &arr_scs[counter];
-
-    if(!MMR_CAN_GetTimerSCS(_rtrResponse->scsId, _rtrResponse->receiverId, &_rtrResponse->rtr, MMR_CAN_GetCurrentTime, 500))
-    {
-      // do something
-    }
-
-    counter++;
-
-    if (_rtrResponse->rtr==1)
-    {
-      // Return ritrasmission
-    }
-
-    if (_rtrResponse->rtr>1)
-    {
-      // Return Safe State
-    }
+  clearEntry(header);
+  return true;
 }
 
 
-TimerRange MMR_CAN_GetCurrentTime()
-{
+HalStatus MMR_CAN_SendSCS(
+  CanHandle *hcan,
+  MmrCanMessageId scsId,
+  CanId senderId
+) {
+  MmrCanHeader header = {
+    .senderId = senderId,
+    .messageId = scsId,
+    .priority = MMR_CAN_MESSAGE_PRIORITY_HIGH,
+  };
+
+  putEntry(header);
+  return sendScs(hcan, header);
+}
+
+
+HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
+  static int counter = 0;
+  MmrCanScsEntry *entry = &__scsEntries[counter++ % MMR_CAN_SCS_ENTRIES_COUNT];
+
+  switch (checkScs(entry)) {
+  case MMR_CAN_SCS_CHECK_ERROR: return HAL_ERROR;
+  case MMR_CAN_SCS_CHECK_OK: return HAL_OK;
+  default: break;
+  }
+
+  entry->counter = getCurrentTime();
+  return sendScs(hcan, entry->header);
+}
+
+
+HalStatus sendScs(CanHandle *hcan, MmrCanHeader header) {
+  static CanMailbox scsMailbox = 0;
+  MmrCanPacket packet = {
+    .header = header,
+    .mailbox = &scsMailbox,
+    .length = 0,
+  };
+
+  return MMR_CAN_Send(hcan, packet);
+}
+
+
+MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry) {
+  maybeIncrementRTR(entry);
+  return
+    entry->rtr == 1 ? MMR_CAN_SCS_CHECK_RTR :
+    entry->rtr > 1 ? MMR_CAN_SCS_CHECK_ERROR :
+    MMR_CAN_SCS_CHECK_OK;
+}
+
+
+TimerRange getCurrentTime() {
   return 0; //TODO: HAL....
 }
 
-RTRresponse* findResponse(MmrCanMessageId scsId, CanId receiverId) {
-  int i = 0;
-  for (; i < MMR_SCS_NR_TIMERS; i++) {
-    RTRresponse *response = arr_scs + i;
 
-    if (response->scsId == scsId && response->receiverId == receiverId) {
-      return response;
+void maybeIncrementRTR(MmrCanScsEntry *entry) {
+  TimerRange delay =
+    getCurrentTime() - entry->counter;
+
+  if (delay >= MMR_CAN_MAX_TIMEOUT) {
+    entry->rtr++;
+  }
+}
+
+
+MmrCanScsEntry* putEntry(MmrCanHeader header) {
+  MmrCanScsEntry *entry = findEntry((MmrCanHeader){});
+  if (entry == NULL) {
+    return NULL;
+  }
+
+  *entry = (MmrCanScsEntry){
+    .header = header,
+    .counter = getCurrentTime(),
+  };
+
+  return entry;
+}
+
+MmrCanScsEntry* clearEntry(MmrCanHeader header) {
+  MmrCanScsEntry *entry = findEntry(header);
+  if (entry == NULL) {
+    return NULL;
+  }
+
+  *entry = (MmrCanScsEntry){};
+  return entry;
+}
+
+MmrCanScsEntry* findEntry(MmrCanHeader header) {
+  uint32_t *target = MMR_CAN_HeaderToBits(&header);
+  uint32_t i = 0;
+
+  for (; i < MMR_CAN_SCS_ENTRIES_COUNT; i++) {
+    MmrCanScsEntry *entry = __scsEntries + i;
+    uint32_t *curr = MMR_CAN_HeaderToBits(&entry->header);
+
+    if (*curr == *target) {
+      return entry;
     }
   }
 
