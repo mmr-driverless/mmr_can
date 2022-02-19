@@ -2,6 +2,14 @@
 #include "mmr_can_util.h"
 
 
+MmrCanTickProvider __mmr_can_tickProvider;
+
+
+void MMR_CAN_Init(MmrCanTickProvider tickProvider) {
+  __mmr_can_tickProvider = tickProvider;
+}
+
+
 /**
  * @brief
  * Initializes the filter using the values

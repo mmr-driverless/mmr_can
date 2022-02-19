@@ -82,7 +82,7 @@ MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry) {
 
 
 TimerRange getCurrentTime() {
-  return 0; //TODO: HAL....
+  return __mmr_can_tickProvider();
 }
 
 

@@ -30,6 +30,7 @@
 #define MMR_CAN_MAX_DATA_LENGTH 8
 #endif
 
+typedef uint32_t (*MmrCanTickProvider)();
 typedef uint8_t CanRxBuffer[MMR_CAN_MAX_DATA_LENGTH];
 
 
@@ -155,6 +156,9 @@ typedef struct {
   MMR_CAN_FilterConfig(phcan, MMR_CAN_GetDefaultFilterSettings())
 
 
+extern MmrCanTickProvider __mmr_can_tickProvider;
+
+void MMR_CAN_Init(MmrCanTickProvider tickProvider);
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan);
 HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings);
 CanFilterMask MMR_CAN_AlignStandardMask(CanFilterMask baseMask);
