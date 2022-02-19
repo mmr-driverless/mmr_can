@@ -60,7 +60,10 @@ HalStatus MMR_CAN_SendScs(
 
 HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
   static int counter = 0;
-  MmrCanScsEntry *entry = &__scsEntries[counter++ % MMR_CAN_SCS_ENTRIES_COUNT];
+
+  MmrCanScsEntry *entry = &__scsEntries[counter];
+  counter++;
+  counter %= MMR_CAN_SCS_ENTRIES_COUNT;
 
   if (MMR_CAN_HeaderToBits(entry->header) == 0) {
 	return HAL_OK;
@@ -104,8 +107,8 @@ TimerRange getCurrentTime() {
 
 
 void maybeIncrementRTR(MmrCanScsEntry *entry) {
-  TimerRange delay =
-    getCurrentTime() - entry->counter;
+  TimerRange now = getCurrentTime();
+  TimerRange delay = now - entry->counter;
 
   if (delay >= MMR_CAN_MAX_TIMEOUT) {
     entry->rtr++;
