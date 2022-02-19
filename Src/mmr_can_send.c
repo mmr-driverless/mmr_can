@@ -36,11 +36,29 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
       .TransmitGlobalTime = DISABLE,
     },
   };
-  syncHeaders(&tp);
 
+  syncHeaders(&tp);
   return packet.length <= MMR_CAN_MAX_DATA_LENGTH
     ? sendNormal(&tp)
     : sendMulti(&tp);
+}
+
+
+HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet) {
+  TransmissionParams tp = {
+    .handle = hcan,
+    .packet = &packet,
+	.headers.mmr = packet.header,
+    .headers.tx = {
+      .IDE = CAN_ID_EXT,
+      .RTR = CAN_RTR_DATA,
+      .DLC = packet.length,
+      .TransmitGlobalTime = DISABLE,
+    },
+  };
+
+  syncHeaders(&tp);
+  return send(&tp);
 }
 
 

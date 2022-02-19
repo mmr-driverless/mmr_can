@@ -18,6 +18,7 @@
  * Constants with lower values have an higher priority.
  */
 typedef enum {
+  MMR_CAN_MESSAGE_TYPE_SCS = B_(0000),
   MMR_CAN_MESSAGE_TYPE_ACK = B_(0001),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME = B_(0010),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END = B_(0011),
@@ -62,6 +63,12 @@ uint32_t *MMR_CAN_HeaderToBits(MmrCanHeader *header);
  */
 MmrCanHeader *MMR_CAN_HeaderFromBits(uint32_t *bits);
 
+
+/**
+ * @brief
+ * Tells wether the given header represents an SCS.
+ */
+bool MMR_CAN_IsHeaderScs(MmrCanHeader header);
 bool MMR_CAN_IsMultiFrame(MmrCanHeader *header);
 bool MMR_CAN_IsMultiFrameEnd(MmrCanHeader *header);
 

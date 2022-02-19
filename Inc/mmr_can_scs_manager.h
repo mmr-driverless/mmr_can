@@ -50,6 +50,12 @@ typedef enum {
 
 bool MMR_CAN_MaybeHandleAck(MmrCanHeader header);
 HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan);
+
+HalStatus MMR_CAN_SendAck(
+  CanHandle *hcan,
+  MmrCanHeader originalHeader
+);
+
 HalStatus MMR_CAN_SendScs(
   CanHandle *hcan,
   MmrCanMessageId scsId,

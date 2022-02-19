@@ -165,6 +165,7 @@ CanFilterMask MMR_CAN_AlignStandardMask(CanFilterMask baseMask);
 MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
 
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
+HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet);
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
 
 #endif /* INC_MMR_CAN_H_ */

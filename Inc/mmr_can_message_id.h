@@ -47,13 +47,6 @@ uint8_t MMR_CAN_GetMessageIdSubtype(MmrCanMessageId msgId);
  */
 bool MMR_CAN_IsMessageIdOfType(MmrCanMessageId msgId, MmrCanMessageIdType type);
 
-/**
- * @brief
- * Tells wether the given message id is
- * represents an SCS.
- */
-bool MMR_CAN_IsMessageIdSCS(MmrCanMessageId msgId);
-
 
 enum MmrCanMessageId {
 // SCS

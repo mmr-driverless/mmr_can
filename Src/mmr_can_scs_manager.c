@@ -18,7 +18,7 @@ bool MMR_CAN_MaybeHandleAck(MmrCanHeader header) {
     return false;
   }
 
-  header.messageType = MMR_CAN_MESSAGE_TYPE_NORMAL;
+  header.messageType = MMR_CAN_MESSAGE_TYPE_SCS;
   MmrCanScsEntry *entry = findEntry(header);
   if (entry == NULL) {
     return false;
@@ -26,6 +26,15 @@ bool MMR_CAN_MaybeHandleAck(MmrCanHeader header) {
 
   clearEntry(header);
   return true;
+}
+
+
+HalStatus MMR_CAN_SendAck(
+  CanHandle *hcan,
+  MmrCanHeader originalHeader
+) {
+  originalHeader.messageType = MMR_CAN_MESSAGE_TYPE_ACK;
+  return sendScs(hcan, originalHeader);
 }
 
 
@@ -38,9 +47,13 @@ HalStatus MMR_CAN_SendScs(
     .senderId = senderId,
     .messageId = scsId,
     .priority = MMR_CAN_MESSAGE_PRIORITY_HIGH,
+	.messageType = MMR_CAN_MESSAGE_TYPE_SCS,
   };
 
-  putEntry(header);
+  if (putEntry(header) == NULL) {
+	return HAL_ERROR;
+  }
+
   return sendScs(hcan, header);
 }
 
@@ -68,7 +81,7 @@ HalStatus sendScs(CanHandle *hcan, MmrCanHeader header) {
     .length = 0,
   };
 
-  return MMR_CAN_Send(hcan, packet);
+  return MMR_CAN_SendNoTamper(hcan, packet);
 }
 
 

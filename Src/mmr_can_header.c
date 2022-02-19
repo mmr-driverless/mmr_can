@@ -11,6 +11,10 @@ MmrCanHeader *MMR_CAN_HeaderFromBits(uint32_t *bits) {
 }
 
 
+bool MMR_CAN_IsHeaderScs(MmrCanHeader header) {
+  return header.messageType == MMR_CAN_MESSAGE_TYPE_SCS;
+}
+
 bool MMR_CAN_IsMultiFrame(MmrCanHeader *header) {
   return header->messageType == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
 }
