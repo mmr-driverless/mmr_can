@@ -9,7 +9,7 @@ static MmrCanScsEntry* clearEntry(MmrCanHeader header);
 static MmrCanScsEntry* findEntry(MmrCanHeader header);
 
 static TimerRange getCurrentTime();
-static HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
+HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
 static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry);
 
 
@@ -61,6 +61,10 @@ HalStatus MMR_CAN_SendScs(
 HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
   static int counter = 0;
   MmrCanScsEntry *entry = &__scsEntries[counter++ % MMR_CAN_SCS_ENTRIES_COUNT];
+
+  if (MMR_CAN_HeaderToBits(entry->header) == 0) {
+	return HAL_OK;
+  }
 
   switch (checkScs(entry)) {
   case MMR_CAN_SCS_CHECK_ERROR: return HAL_ERROR;
@@ -134,14 +138,14 @@ MmrCanScsEntry* clearEntry(MmrCanHeader header) {
 }
 
 MmrCanScsEntry* findEntry(MmrCanHeader header) {
-  uint32_t *target = MMR_CAN_HeaderToBits(&header);
+  uint32_t target = MMR_CAN_HeaderToBits(header);
   uint32_t i = 0;
 
   for (; i < MMR_CAN_SCS_ENTRIES_COUNT; i++) {
     MmrCanScsEntry *entry = __scsEntries + i;
-    uint32_t *curr = MMR_CAN_HeaderToBits(&entry->header);
+    uint32_t curr = MMR_CAN_HeaderToBits(entry->header);
 
-    if (*curr == *target) {
+    if (curr == target) {
       return entry;
     }
   }

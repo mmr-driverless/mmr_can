@@ -24,6 +24,9 @@ static void setMessageType(TransmissionParams *header, MmrCanMessageType type);
 static void syncHeaders(TransmissionParams *tp);
 
 
+static CanMailbox __mailbox;
+
+
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp = {
     .handle = hcan,
@@ -57,7 +60,6 @@ HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet) {
     },
   };
 
-  syncHeaders(&tp);
   return send(&tp);
 }
 
@@ -108,13 +110,13 @@ static HalStatus send(TransmissionParams *tp) {
     tp->handle,
     &tp->headers.tx,
     tp->packet->data,
-    tp->packet->mailbox
+    &__mailbox
   );
 }
 
 
 static void syncHeaders(TransmissionParams *tp) {
-  tp->headers.tx.ExtId = *MMR_CAN_HeaderToBits(&tp->headers.mmr);
+  tp->headers.tx.ExtId = MMR_CAN_HeaderToBits(tp->headers.mmr);
 }
 
 

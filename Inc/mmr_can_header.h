@@ -54,14 +54,14 @@ typedef struct {
  * 3 bits set to zero and the remaining 29 containing the
  * extended id
  */
-uint32_t *MMR_CAN_HeaderToBits(MmrCanHeader *header);
+uint32_t MMR_CAN_HeaderToBits(MmrCanHeader header);
 
 /**
  * @brief
  * Converts a 32bits integer to an MmrCanHeader.
  * The left-most 3 bits must be of padding.
  */
-MmrCanHeader *MMR_CAN_HeaderFromBits(uint32_t *bits);
+MmrCanHeader MMR_CAN_HeaderFromBits(uint32_t bits);
 
 
 /**

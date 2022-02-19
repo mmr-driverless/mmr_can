@@ -64,10 +64,14 @@ static HalStatus receiveAll(ReceptionParams *rp) {
 
 
 static HalStatus receiveOne(ReceptionParams *rp) {
-  HalStatus status =
-    HAL_CAN_GetRxMessage(rp->handle, rp->fifo, &(rp->headers.rx), rp->result);
+  HalStatus status = HAL_CAN_GetRxMessage(
+    rp->handle,
+	rp->fifo,
+	&rp->headers.rx,
+	rp->result
+  );
 
-  rp->headers.mmr = convertTo(MmrCanHeader, rp->headers.rx.ExtId);
+  rp->headers.mmr = MMR_CAN_HeaderFromBits(rp->headers.rx.ExtId);
   return status;
 }
 
