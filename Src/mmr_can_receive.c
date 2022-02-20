@@ -55,7 +55,8 @@ static HalStatus receiveAll(ReceptionParams *rp) {
   do {
     rp->result += MMR_CAN_MAX_DATA_LENGTH;
     status |= receiveOne(rp);
-  } while (
+  }
+  while (
     headerIsMultiFrame(&rp->headers.mmr, targetId) && status == HAL_OK
   );
 
@@ -66,9 +67,9 @@ static HalStatus receiveAll(ReceptionParams *rp) {
 static HalStatus receiveOne(ReceptionParams *rp) {
   HalStatus status = HAL_CAN_GetRxMessage(
     rp->handle,
-	rp->fifo,
-	&rp->headers.rx,
-	rp->result
+    rp->fifo,
+    &rp->headers.rx,
+    rp->result
   );
 
   rp->headers.mmr = MMR_CAN_HeaderFromBits(rp->headers.rx.ExtId);

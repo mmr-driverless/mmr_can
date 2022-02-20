@@ -31,7 +31,7 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp = {
     .handle = hcan,
     .packet = &packet,
-	.headers.mmr = packet.header,
+    .headers.mmr = packet.header,
     .headers.tx = {
       .IDE = CAN_ID_EXT,
       .RTR = CAN_RTR_DATA,
@@ -51,7 +51,7 @@ HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp = {
     .handle = hcan,
     .packet = &packet,
-	.headers.mmr = packet.header,
+    .headers.mmr = packet.header,
     .headers.tx = {
       .IDE = CAN_ID_EXT,
       .RTR = CAN_RTR_DATA,

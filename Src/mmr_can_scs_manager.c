@@ -47,11 +47,11 @@ HalStatus MMR_CAN_SendScs(
     .senderId = senderId,
     .messageId = scsId,
     .priority = MMR_CAN_MESSAGE_PRIORITY_HIGH,
-	.messageType = MMR_CAN_MESSAGE_TYPE_SCS,
+    .messageType = MMR_CAN_MESSAGE_TYPE_SCS,
   };
 
   if (putEntry(header) == NULL) {
-	return HAL_ERROR;
+    return HAL_ERROR;
   }
 
   return sendScs(hcan, header);
@@ -66,13 +66,13 @@ HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
   counter %= MMR_CAN_SCS_ENTRIES_COUNT;
 
   if (MMR_CAN_HeaderToBits(entry->header) == 0) {
-	return HAL_OK;
+    return HAL_OK;
   }
 
   switch (checkScs(entry)) {
-  case MMR_CAN_SCS_CHECK_ERROR: return HAL_ERROR;
-  case MMR_CAN_SCS_CHECK_OK: return HAL_OK;
-  default: break;
+    case MMR_CAN_SCS_CHECK_ERROR: return HAL_ERROR;
+    case MMR_CAN_SCS_CHECK_OK: return HAL_OK;
+    default: break;
   }
 
   entry->counter = getCurrentTime();
