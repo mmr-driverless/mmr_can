@@ -1,9 +1,5 @@
+#include <stdint.h>
 #include "mmr_can_message_id.h"
-
-
-bool MMR_CAN_IsMessageIdSCS(MmrCanMessageId msgId) {
-  return MMR_CAN_IsMessageIdOfType(msgId, MMR_CAN_MESSAGE_ID_TYPE_SCS);
-}
 
 
 bool MMR_CAN_IsMessageIdOfType(

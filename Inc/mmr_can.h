@@ -1,3 +1,9 @@
+/**
+ * @file mmr_can.h
+ * @brief
+ * Main header for the mmr_can library.
+ */
+
 #ifndef INC_MMR_CAN_H_
 #define INC_MMR_CAN_H_
 
@@ -8,6 +14,7 @@
 #include "mmr_can_types.h"
 #include "mmr_can_optimize.h"
 #include "mmr_can_binary_literals.h"
+#include "mmr_can_scs.h"
 
 #ifndef MMR_CAN_RX_FIFO
 #define MMR_CAN_RX_FIFO CAN_RX_FIFO0
@@ -29,6 +36,13 @@
 #define MMR_CAN_MAX_DATA_LENGTH 8
 #endif
 
+
+typedef uint32_t (*MmrCanTickProvider)();
+
+/**
+ * @brief
+ * A buffer large enough to hold a CAN payload.
+ */
 typedef uint8_t CanRxBuffer[MMR_CAN_MAX_DATA_LENGTH];
 
 
@@ -65,9 +79,42 @@ typedef struct {
 } MmrCanFilterSettings;
 
 
+/**
+ * @brief
+ * A packet that can be sent over a CAN
+ * network.
+ *
+ * @example
+ * typedef struct {
+ *   int x;
+ *   int y;
+ * } Point;
+ *
+ * HalStatus send(Point point) {
+ *   MmrCanPacket packet = {
+ *     .header = {
+ *       .priority = MMR_CAN_MESSAGE_PRIORITY_NORMAL,
+ *       .messageId = MMR_CAN_EXAMPLES_POINT,
+ *       .senderId = 0xXXX,
+ *     },
+ *     .data = (uint8_t*)&point,
+ *     .length = sizeof(point),
+ *   };
+ *
+ *   return MMR_CAN_Send(&hcan, packet);
+ * }
+ *
+ * int main() {
+ *   Point p = {10, 20};
+ *   if (send(p) != HAL_OK) {
+ *     Error_Handler();
+ *   }
+ *
+ *   // 'p' has been sent.
+ * }
+ */
 typedef struct {
   MmrCanHeader header;
-  CanMailbox *mailbox;
   uint8_t *data;
   uint8_t length;
 } MmrCanPacket;
@@ -75,7 +122,37 @@ typedef struct {
 
 /**
  * @brief
- * Represents a CAN message
+ * A message received over a CAN network.
+ *
+ * @example
+ * typedef struct {
+ *   int x;
+ *   int y;
+ * } Point;
+ *
+ * HalStatus receive(Point *result) {
+ *   MmrCanMessage message = {
+ *     .store = result,
+ *   };
+ *
+ *   HalStatus result = MMR_CAN_Receive(&hcan, &message);
+ *   bool isAPoint = message.header.messageId == MMR_CAN_EXAMPLES_POINT;
+ *   if (!isAPoint) {
+ *     return HAL_ERROR;
+ *   }
+ *
+ *   return result;
+ * }
+ *
+ * int main() {
+ *   Point p = {};
+ *   if (receive(&p) != HAL_OK) {
+ *     Error_Handler();
+ *   }
+ *
+ *   // here 'p' has been populated and can
+ *   // be used.
+ * }
  */
 typedef struct {
   MmrCanHeader header;
@@ -87,12 +164,76 @@ typedef struct {
   MMR_CAN_FilterConfig(phcan, MMR_CAN_GetDefaultFilterSettings())
 
 
+/**
+ * @brief
+ * A function that provides the current tick.
+ * Used to track the delay between message
+ * and acknowledgment. 
+ */
+extern MmrCanTickProvider __mmr_can_tickProvider;
+
+
+/**
+ * @brief
+ * Sets the tick provider.
+ * 
+ * @param tickProvider
+ *  The function to use when fetching the current tick.
+ */
+void MMR_CAN_SetTickProvider(MmrCanTickProvider tickProvider);
+
+/**
+ * @brief
+ * Returns the current tick by calling the
+ * configured tick provider.
+ */
+uint32_t MMR_CAN_GetCurrentTick();
+
+/**
+ * @brief
+ * Configures the filters with the default configuration
+ * and starts the can interface.
+ */
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan);
+
+/**
+ * @brief
+ * Configures the filters.
+ */
 HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings);
-CanFilterMask MMR_CAN_AlignStandardMask(CanFilterMask baseMask);
+
+/**
+ * @brief
+ * Provides the default configuration for
+ * the filters. 
+ */
 MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
 
+/**
+ * @brief
+ * Sends a can packet over the network.
+ * Based on the data length, the packet may be split
+ * into multiple frames.
+ * 
+ * It is not recommended to send more than 8 bytes, as the
+ * 'multiple frames' feature has not been fully implemented yet.
+ */
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
+
+/**
+ * @brief
+ * Sends a can packet over the network as is, without
+ * changing the data that is provided.
+ * 
+ * This can prevent the sudden change of the header's message type when
+ * using MMR_CAN_Send.
+ */
+HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet);
+
+/**
+ * @brief
+ * Receives a can message from the network.
+ */
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
 
 #endif /* INC_MMR_CAN_H_ */

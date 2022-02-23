@@ -17,7 +17,7 @@ typedef struct {
 
 static HalStatus receiveOne(ReceptionParams *rp);
 static HalStatus receiveAll(ReceptionParams *rp);
-static bool headerIsMultiFrame(MmrCanHeader *header, CanId targetId);
+static bool headerIsMultiFrame(MmrCanHeader header, CanId targetId);
 
 
 /**
@@ -41,7 +41,7 @@ HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result) {
   }
 
   result->header = rp.headers.mmr;
-  if (MMR_CAN_IsMultiFrame(&rp.headers.mmr)) {
+  if (MMR_CAN_IsMultiFrame(rp.headers.mmr)) {
     status |= receiveAll(&rp);
   }
 
@@ -55,8 +55,9 @@ static HalStatus receiveAll(ReceptionParams *rp) {
   do {
     rp->result += MMR_CAN_MAX_DATA_LENGTH;
     status |= receiveOne(rp);
-  } while (
-    headerIsMultiFrame(&rp->headers.mmr, targetId) && status == HAL_OK
+  }
+  while (
+    headerIsMultiFrame(rp->headers.mmr, targetId) && status == HAL_OK
   );
 
   return status;
@@ -64,17 +65,21 @@ static HalStatus receiveAll(ReceptionParams *rp) {
 
 
 static HalStatus receiveOne(ReceptionParams *rp) {
-  HalStatus status =
-    HAL_CAN_GetRxMessage(rp->handle, rp->fifo, &(rp->headers.rx), rp->result);
+  HalStatus status = HAL_CAN_GetRxMessage(
+    rp->handle,
+    rp->fifo,
+    &rp->headers.rx,
+    rp->result
+  );
 
-  rp->headers.mmr = convertTo(MmrCanHeader, rp->headers.rx.ExtId);
+  rp->headers.mmr = MMR_CAN_HeaderFromBits(rp->headers.rx.ExtId);
   return status;
 }
 
 
-static always_inline bool headerIsMultiFrame(MmrCanHeader *header, CanId targetId) {
+static bool headerIsMultiFrame(MmrCanHeader header, CanId targetId) {
   return
     MMR_CAN_IsMultiFrame(header) &&
     !MMR_CAN_IsMultiFrameEnd(header) &&
-    header->senderId == targetId;
+    header.senderId == targetId;
 }

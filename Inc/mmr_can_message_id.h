@@ -1,6 +1,21 @@
+/**
+ * @file mmr_can_message_id.h
+ * @brief
+ * This header contains the message id declarations.
+ * 
+ * Message ids identify a message, allowing the receiver
+ * to take appropriate action when parsing one.
+ * 
+ * For example, a can packet with message id set to
+ * MMR_CAN_MESSAGE_ID_POINT might be interpreted as
+ * a message carrying a struct Point { int x; int y; };,
+ * and thus deserialized accordingly.
+ */
+
 #ifndef INC_MMR_CAN_MESSAGE_ID_H_
 #define INC_MMR_CAN_MESSAGE_ID_H_
 
+#include <stdint.h>
 #include <stdbool.h>
 #include "mmr_can_binary_literals.h"
 
@@ -23,11 +38,28 @@ typedef enum {
 } MmrCanMessageIdType;
 
 
+/**
+ * @brief
+ * Returns the 3 bits representing
+ * the MmrCanMessageIdType.
+ */
 uint8_t MMR_CAN_GetMessageIdType(MmrCanMessageId msgId);
+
+/**
+ * @brief
+ * Returns the 7 bits representing
+ * the message id's subtype.
+ */
 uint8_t MMR_CAN_GetMessageIdSubtype(MmrCanMessageId msgId);
 
+/**
+ * @brief
+ * Tells wether the provided message
+ * is of the given id type.
+ *
+ * E.g. if a message is an SCS.
+ */
 bool MMR_CAN_IsMessageIdOfType(MmrCanMessageId msgId, MmrCanMessageIdType type);
-bool MMR_CAN_IsMessageIdSCS(MmrCanMessageId msgId);
 
 
 enum MmrCanMessageId {
@@ -49,7 +81,7 @@ enum MmrCanMessageId {
   MMR_CAN_MESSAGE_ID_SCS_AS_READY,
   MMR_CAN_MESSAGE_ID_SCS_AS_DRIVING,
   MMR_CAN_MESSAGE_ID_SCS_AS_OFF,
-  
+
   MMR_CAN_MESSAGE_ID_SCS_AM_MANUAL_DRIVING,
   MMR_CAN_MESSAGE_ID_SCS_AM_ACCELERATION,
   MMR_CAN_MESSAGE_ID_SCS_AM_SKIDPAD,

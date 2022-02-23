@@ -14,6 +14,7 @@ typedef struct {
 } TransmissionParams;
 
 
+static TransmissionParams buildParams(CanHandle *hcan, MmrCanPacket packet);
 static HalStatus send(TransmissionParams *tp);
 static HalStatus sendNormal(TransmissionParams *tp);
 static HalStatus sendMulti(TransmissionParams *tp);
@@ -24,10 +25,33 @@ static void setMessageType(TransmissionParams *header, MmrCanMessageType type);
 static void syncHeaders(TransmissionParams *tp);
 
 
+static CanMailbox __mailbox;
+
+
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
-  TransmissionParams tp = {
+  TransmissionParams tp =
+    buildParams(hcan, packet);
+
+  syncHeaders(&tp);
+  return packet.length <= MMR_CAN_MAX_DATA_LENGTH
+    ? sendNormal(&tp)
+    : sendMulti(&tp);
+}
+
+
+HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet) {
+  TransmissionParams tp =
+    buildParams(hcan, packet);
+
+  return send(&tp);
+}
+
+
+static TransmissionParams buildParams(CanHandle *hcan, MmrCanPacket packet) {
+  return (TransmissionParams) {
     .handle = hcan,
     .packet = &packet,
+    .headers.mmr = packet.header,
     .headers.tx = {
       .IDE = CAN_ID_EXT,
       .RTR = CAN_RTR_DATA,
@@ -35,11 +59,6 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
       .TransmitGlobalTime = DISABLE,
     },
   };
-  syncHeaders(&tp);
-
-  return packet.length <= MMR_CAN_MAX_DATA_LENGTH
-    ? sendNormal(&tp)
-    : sendMulti(&tp);
 }
 
 
@@ -72,11 +91,13 @@ static HalStatus sendSingleMultiFrame(TransmissionParams *tp) {
   uint8_t length =
     computeNextMessageLength(tp->packet);
 
-  tp->packet->length -= length;
-  tp->packet->data += length;
   tp->headers.tx.DLC = length;
+  tp->packet->length -= length;
 
-  return send(tp);
+  HalStatus result = send(tp);
+
+  tp->packet->data += length;
+  return result;
 }
 
 
@@ -87,13 +108,13 @@ static HalStatus send(TransmissionParams *tp) {
     tp->handle,
     &tp->headers.tx,
     tp->packet->data,
-    tp->packet->mailbox
+    &__mailbox
   );
 }
 
 
 static void syncHeaders(TransmissionParams *tp) {
-  tp->headers.tx.ExtId = *MMR_CAN_HeaderToBits(&tp->headers.mmr);
+  tp->headers.tx.ExtId = MMR_CAN_HeaderToBits(tp->headers.mmr);
 }
 
 

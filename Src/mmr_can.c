@@ -2,12 +2,19 @@
 #include "mmr_can_util.h"
 
 
-/**
- * @brief
- * Initializes the filter using the values
- * from MMR_CAN_GetDefaultFilterSettings, and then
- * starts the CAN
- */
+MmrCanTickProvider __mmr_can_tickProvider;
+
+
+void MMR_CAN_SetTickProvider(MmrCanTickProvider tickProvider) {
+  __mmr_can_tickProvider = tickProvider;
+}
+
+
+uint32_t MMR_CAN_GetCurrentTick() {
+  return __mmr_can_tickProvider();
+}
+
+
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan) {
   return
     MMR_CAN_FilterConfigDefault(hcan) |
