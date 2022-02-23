@@ -5,8 +5,8 @@
  * such as transmission, retransmission and timeout error.
  */
 
-#ifndef INC_MMR_CAN_SCS_MANAGER_H_
-#define INC_MMR_CAN_SCS_MANAGER_H_
+#ifndef INC_MMR_CAN_SCS_H_
+#define INC_MMR_CAN_SCS_H_
 
 #include "mmr_can.h"
 
@@ -152,4 +152,4 @@ MmrCanScsEntry* MMR_CAN_PutScsEntry(MmrCanHeader header);
 MmrCanScsEntry* MMR_CAN_ClearScsEntry(MmrCanHeader header);
 MmrCanScsEntry* MMR_CAN_FindScsEntry(MmrCanHeader header);
 
-#endif // !INC_MMR_CAN_SCS_MANAGER_H_
+#endif // !INC_MMR_CAN_SCS_H_
