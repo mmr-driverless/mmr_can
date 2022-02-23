@@ -1,3 +1,17 @@
+/**
+ * @file mmr_can_message_id.h
+ * @brief
+ * This header contains the message id declarations.
+ * 
+ * Message ids identify a message, allowing the receiver
+ * to take appropriate action when parsing one.
+ * 
+ * For example, a can packet with message id set to
+ * MMR_CAN_MESSAGE_ID_POINT might be interpreted as
+ * a message carrying a struct Point { int x; int y; };,
+ * and thus deserialized accordingly.
+ */
+
 #ifndef INC_MMR_CAN_MESSAGE_ID_H_
 #define INC_MMR_CAN_MESSAGE_ID_H_
 

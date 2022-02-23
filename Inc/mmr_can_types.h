@@ -1,3 +1,9 @@
+/**
+ * @file mmr_can_types.h
+ * @brief
+ * Basic type definitions for the can.
+ */
+
 #ifndef INC_MMR_CAN_TYPES_H_
 #define INC_MMR_CAN_TYPES_H_
 

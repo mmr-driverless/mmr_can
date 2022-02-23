@@ -1,3 +1,9 @@
+/**
+ * @file mmr_can.h
+ * @brief
+ * Main header for the mmr_can library.
+ */
+
 #ifndef INC_MMR_CAN_H_
 #define INC_MMR_CAN_H_
 
@@ -30,7 +36,13 @@
 #define MMR_CAN_MAX_DATA_LENGTH 8
 #endif
 
+
 typedef uint32_t (*MmrCanTickProvider)();
+
+/**
+ * @brief
+ * A buffer large enough to hold a CAN payload.
+ */
 typedef uint8_t CanRxBuffer[MMR_CAN_MAX_DATA_LENGTH];
 
 
@@ -156,7 +168,14 @@ typedef struct {
   MMR_CAN_FilterConfig(phcan, MMR_CAN_GetDefaultFilterSettings())
 
 
+/**
+ * @brief
+ * A function that provides the current tick.
+ * Used to track the delay between message
+ * and acknowledgment. 
+ */
 extern MmrCanTickProvider __mmr_can_tickProvider;
+
 
 void MMR_CAN_Init(MmrCanTickProvider tickProvider);
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan);

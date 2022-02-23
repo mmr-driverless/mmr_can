@@ -1,3 +1,9 @@
+/**
+ * @file mmr_can_util.h
+ * @brief
+ * Utility functions and macros.
+ */
+
 #ifndef INC_MMR_CAN_UTIL_H_
 #define INC_MMR_CAN_UTIL_H_
 

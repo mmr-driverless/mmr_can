@@ -1,3 +1,9 @@
+/**
+ * @file mmr_can_optimize.h
+ * @brief
+ * Low level optimization utilities.
+ */
+
 #ifndef INC_MMR_CAN_OPTIMIZE_H_
 #define INC_MMR_CAN_OPTIMIZE_H_
 

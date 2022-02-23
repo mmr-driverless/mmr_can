@@ -1,3 +1,14 @@
+/**
+ * @file mmr_can_events.h
+ * @brief
+ * This header provides a set of utilities for working
+ * with interrupts.
+ * 
+ * The recommended way of readings the CAN bus is
+ * via polling, altought interrupt may be used for
+ * monitoring critical messages.
+ */
+
 #ifndef INC_MMR_CAN_EVENTS_H_
 #define INC_MMR_CAN_EVENTS_H_
 

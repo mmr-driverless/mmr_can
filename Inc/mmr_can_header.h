@@ -1,3 +1,13 @@
+/**
+ * @file mmr_can_header.h
+ * @brief
+ * This file defines the header used for the can message,
+ * along with its utilities.
+ * 
+ * With header is intended the ExtendedId portion
+ * of the can message.
+ */
+
 #ifndef INC_MMR_CAN_HEADER_H_
 #define INC_MMR_CAN_HEADER_H_
 
@@ -49,7 +59,7 @@ typedef struct {
 
 /**
  * @brief
- * Converts an MmrCanHeader to bits.
+ * Serializes an MmrCanHeader to bits.
  * That is, a 32bits integer with the first
  * 3 bits set to zero and the remaining 29 containing the
  * extended id
@@ -58,8 +68,8 @@ uint32_t MMR_CAN_HeaderToBits(MmrCanHeader header);
 
 /**
  * @brief
- * Converts a 32bits integer to an MmrCanHeader.
- * The left-most 3 bits must be of padding.
+ * Deserializes a 32bits integer to an MmrCanHeader.
+ * The 3 left-most bits must be of padding.
  */
 MmrCanHeader MMR_CAN_HeaderFromBits(uint32_t bits);
 
