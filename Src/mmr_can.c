@@ -10,6 +10,11 @@ void MMR_CAN_SetTickProvider(MmrCanTickProvider tickProvider) {
 }
 
 
+uint32_t MMR_CAN_GetCurrentTick() {
+  return __mmr_can_tickProvider();
+}
+
+
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan) {
   return
     MMR_CAN_FilterConfigDefault(hcan) |

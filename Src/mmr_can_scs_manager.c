@@ -1,7 +1,6 @@
-#include "mmr_can_scs_manager.h"
+#include "mmr_can_scs.h"
 
 static void maybeIncrementRtr(MmrCanScsEntry *entry);
-static TimerRange getCurrentTime();
 static HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
 static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry);
 
@@ -64,7 +63,7 @@ HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
     default: break;
   }
 
-  entry->counter = getCurrentTime();
+  entry->counter = MMR_CAN_GetCurrentTick();
   return sendScs(hcan, entry->header);
 }
 
@@ -87,14 +86,8 @@ static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry) {
     MMR_CAN_SCS_CHECK_OK;
 }
 
-
-static TimerRange getCurrentTime() {
-  return __mmr_can_tickProvider();
-}
-
-
 static void maybeIncrementRtr(MmrCanScsEntry *entry) {
-  TimerRange now = getCurrentTime();
+  TimerRange now = MMR_CAN_GetCurrentTick();
   TimerRange delay = now - entry->counter;
 
   if (delay >= MMR_CAN_MAX_TIMEOUT) {

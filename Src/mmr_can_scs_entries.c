@@ -1,4 +1,7 @@
-#include "mmr_can_scs_manager.h"
+#include "mmr_can_scs.h"
+
+#define EMPTY_HEADER ((MmrCanHeader){})
+#define EMPTY_ENTRY ((MmrCanScsEntry){})
 
 static MmrCanScsEntry __scsEntries[MMR_CAN_SCS_ENTRIES_COUNT];
 
@@ -15,14 +18,14 @@ MmrCanScsEntry* MMR_CAN_GetNextScsEntry() {
 
 
 MmrCanScsEntry* MMR_CAN_PutScsEntry(MmrCanHeader header) {
-  MmrCanScsEntry *entry = findEntry((MmrCanHeader){});
+  MmrCanScsEntry *entry = MMR_CAN_FindScsEntry(EMPTY_HEADER);
   if (entry == NULL) {
     return NULL;
   }
 
   *entry = (MmrCanScsEntry){
     .header = header,
-    .counter = getCurrentTime(),
+    .counter = MMR_CAN_GetCurrentTick(),
   };
 
   return entry;
@@ -30,12 +33,12 @@ MmrCanScsEntry* MMR_CAN_PutScsEntry(MmrCanHeader header) {
 
 
 MmrCanScsEntry* MMR_CAN_ClearScsEntry(MmrCanHeader header) {
-  MmrCanScsEntry *entry = findEntry(header);
+  MmrCanScsEntry *entry = MMR_CAN_FindScsEntry(header);
   if (entry == NULL) {
     return NULL;
   }
 
-  *entry = (MmrCanScsEntry){};
+  *entry = EMPTY_ENTRY;
   return entry;
 }
 
