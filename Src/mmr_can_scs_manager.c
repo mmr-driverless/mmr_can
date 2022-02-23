@@ -1,15 +1,8 @@
 #include "mmr_can_scs_manager.h"
 
-static MmrCanScsEntry __scsEntries[MMR_CAN_SCS_ENTRIES_COUNT];
-
-static void maybeIncrementRTR(MmrCanScsEntry *entry);
-
-static MmrCanScsEntry* putEntry(MmrCanHeader header);
-static MmrCanScsEntry* clearEntry(MmrCanHeader header);
-static MmrCanScsEntry* findEntry(MmrCanHeader header);
-
+static void maybeIncrementRtr(MmrCanScsEntry *entry);
 static TimerRange getCurrentTime();
-HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
+static HalStatus sendScs(CanHandle *hcan, MmrCanHeader header);
 static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry);
 
 
@@ -19,12 +12,12 @@ bool MMR_CAN_MaybeHandleAck(MmrCanHeader header) {
   }
 
   header.messageType = MMR_CAN_MESSAGE_TYPE_SCS;
-  MmrCanScsEntry *entry = findEntry(header);
+  MmrCanScsEntry *entry = MMR_CAN_FindScsEntry(header);
   if (entry == NULL) {
     return false;
   }
 
-  clearEntry(header);
+  MMR_CAN_ClearScsEntry(header);
   return true;
 }
 
@@ -50,7 +43,7 @@ HalStatus MMR_CAN_SendScs(
     .messageType = MMR_CAN_MESSAGE_TYPE_SCS,
   };
 
-  if (putEntry(header) == NULL) {
+  if (MMR_CAN_PutScsEntry(header) == NULL) {
     return HAL_ERROR;
   }
 
@@ -59,10 +52,7 @@ HalStatus MMR_CAN_SendScs(
 
 
 HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
-  static int counter = 0;
-
-  MmrCanScsEntry *entry = &__scsEntries[counter++];
-  counter %= MMR_CAN_SCS_ENTRIES_COUNT;
+  MmrCanScsEntry *entry = MMR_CAN_GetNextScsEntry();
 
   if (MMR_CAN_HeaderToBits(entry->header) == 0) {
     return HAL_OK;
@@ -79,7 +69,7 @@ HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
 }
 
 
-HalStatus sendScs(CanHandle *hcan, MmrCanHeader header) {
+static HalStatus sendScs(CanHandle *hcan, MmrCanHeader header) {
   MmrCanPacket packet = {
     .header = header,
     .length = 0,
@@ -89,8 +79,8 @@ HalStatus sendScs(CanHandle *hcan, MmrCanHeader header) {
 }
 
 
-MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry) {
-  maybeIncrementRTR(entry);
+static MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry) {
+  maybeIncrementRtr(entry);
   return
     entry->rtr == 1 ? MMR_CAN_SCS_CHECK_RTR :
     entry->rtr > 1 ? MMR_CAN_SCS_CHECK_ERROR :
@@ -98,57 +88,16 @@ MmrCanScsCheckResult checkScs(MmrCanScsEntry *entry) {
 }
 
 
-TimerRange getCurrentTime() {
+static TimerRange getCurrentTime() {
   return __mmr_can_tickProvider();
 }
 
 
-void maybeIncrementRTR(MmrCanScsEntry *entry) {
+static void maybeIncrementRtr(MmrCanScsEntry *entry) {
   TimerRange now = getCurrentTime();
   TimerRange delay = now - entry->counter;
 
   if (delay >= MMR_CAN_MAX_TIMEOUT) {
     entry->rtr++;
   }
-}
-
-
-MmrCanScsEntry* putEntry(MmrCanHeader header) {
-  MmrCanScsEntry *entry = findEntry((MmrCanHeader){});
-  if (entry == NULL) {
-    return NULL;
-  }
-
-  *entry = (MmrCanScsEntry){
-    .header = header,
-    .counter = getCurrentTime(),
-  };
-
-  return entry;
-}
-
-MmrCanScsEntry* clearEntry(MmrCanHeader header) {
-  MmrCanScsEntry *entry = findEntry(header);
-  if (entry == NULL) {
-    return NULL;
-  }
-
-  *entry = (MmrCanScsEntry){};
-  return entry;
-}
-
-MmrCanScsEntry* findEntry(MmrCanHeader header) {
-  uint32_t target = MMR_CAN_HeaderToBits(header);
-  uint32_t i = 0;
-
-  for (; i < MMR_CAN_SCS_ENTRIES_COUNT; i++) {
-    MmrCanScsEntry *entry = __scsEntries + i;
-    uint32_t curr = MMR_CAN_HeaderToBits(entry->header);
-
-    if (curr == target) {
-      return entry;
-    }
-  }
-
-  return NULL;
 }

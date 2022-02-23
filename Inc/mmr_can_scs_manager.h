@@ -146,4 +146,10 @@ HalStatus MMR_CAN_SendScs(
   CanId senderId
 );
 
+
+MmrCanScsEntry* MMR_CAN_GetNextScsEntry();
+MmrCanScsEntry* MMR_CAN_PutScsEntry(MmrCanHeader header);
+MmrCanScsEntry* MMR_CAN_ClearScsEntry(MmrCanHeader header);
+MmrCanScsEntry* MMR_CAN_FindScsEntry(MmrCanHeader header);
+
 #endif // !INC_MMR_CAN_SCS_MANAGER_H_
