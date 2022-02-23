@@ -25,6 +25,14 @@ typedef struct {
 #define MMR_CAN_CreateEventList(handlers) \
   (const MmrCanEventList) { handlers, sizeofarray(handlers) }
 
+
+/**
+ * @brief
+ * Activates the CAN rx interrupts
+ *
+ * When one is fired, the callbacks provided inside the
+ * MmrCanEventList will be invoked
+ */
 HalStatus MMR_CAN_InitRxHandlers(CanHandle *hcan, const MmrCanEventList *rxEvents);
 
 

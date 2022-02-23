@@ -115,7 +115,6 @@ bool MMR_CAN_MaybeHandleAck(MmrCanHeader header);
  * 
  * This function MUST be called at every loop.
  * 
- * @param hcan The interface to use.
  * @return HalStatus
  *  The result of the operation.
  *  HAL_ERROR should immediately be handled as a safe state.
@@ -127,9 +126,7 @@ HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan);
  * Send an acknowledgment packet based on the
  * given scs header.
  * 
- * @param hcan The can interface to use.
- * @param originalHeader The scs header to acknowledge. 
- * @return HalStatus The result of the operation.
+ * @param originalHeader The scs header to acknowledge.
  */
 HalStatus MMR_CAN_SendAck(
   CanHandle *hcan,
@@ -140,10 +137,8 @@ HalStatus MMR_CAN_SendAck(
  * @brief
  * Sends an Scs message.
  * 
- * @param hcan The can interface to use.
  * @param scsId The MMR_CAN_MESSAGE_ID_SCS_xx id.
  * @param senderId The id of this board.
- * @return HalStatus The result of the operation.
  */
 HalStatus MMR_CAN_SendScs(
   CanHandle *hcan,

@@ -177,14 +177,64 @@ typedef struct {
 extern MmrCanTickProvider __mmr_can_tickProvider;
 
 
-void MMR_CAN_Init(MmrCanTickProvider tickProvider);
+/**
+ * @brief
+ * Sets the tick provider.
+ * 
+ * @param tickProvider
+ *  The function to use when fetching the current tick.
+ */
+void MMR_CAN_SetTickProvider(MmrCanTickProvider tickProvider);
+
+/**
+ * @brief
+ * Configures the filters with the default configuration
+ * and starts the can interface.
+ */
 HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan);
+
+/**
+ * @brief
+ * Configures the filters.
+ * 
+ * @param hcan The interface to use.
+ * @param settings The settings to use when configuring the filters.
+ * @return HalStatus The result of the operation.
+ */
 HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings);
-CanFilterMask MMR_CAN_AlignStandardMask(CanFilterMask baseMask);
+
+/**
+ * @brief
+ * Provides the default configuration for
+ * the filters. 
+ */
 MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
 
+/**
+ * @brief
+ * Sends a can packet over the network.
+ * Based on the data length, the packet may be split
+ * into multiple frames.
+ * 
+ * It is not recommended to send more than 8 bytes, as the
+ * 'multiple frames' feature has not been fully implemented yet.
+ */
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
+
+/**
+ * @brief
+ * Sends a can packet over the network as is, without
+ * changing the data that is provided.
+ * 
+ * This can prevent the sudden change of the header's message type when
+ * using MMR_CAN_Send.
+ */
 HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet);
+
+/**
+ * @brief
+ * Receives a can message from the network.
+ */
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
 
 #endif /* INC_MMR_CAN_H_ */
