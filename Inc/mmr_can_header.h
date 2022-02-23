@@ -79,7 +79,7 @@ MmrCanHeader MMR_CAN_HeaderFromBits(uint32_t bits);
  * Tells wether the given header represents an SCS.
  */
 bool MMR_CAN_IsHeaderScs(MmrCanHeader header);
-bool MMR_CAN_IsMultiFrame(MmrCanHeader *header);
-bool MMR_CAN_IsMultiFrameEnd(MmrCanHeader *header);
+bool MMR_CAN_IsMultiFrame(MmrCanHeader header);
+bool MMR_CAN_IsMultiFrameEnd(MmrCanHeader header);
 
 #endif /* INC_MMR_CAN_HEADER_H_ */

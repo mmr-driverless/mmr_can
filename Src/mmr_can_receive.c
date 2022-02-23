@@ -41,7 +41,7 @@ HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result) {
   }
 
   result->header = rp.headers.mmr;
-  if (MMR_CAN_IsMultiFrame(&rp.headers.mmr)) {
+  if (MMR_CAN_IsMultiFrame(rp.headers.mmr)) {
     status |= receiveAll(&rp);
   }
 
@@ -57,7 +57,7 @@ static HalStatus receiveAll(ReceptionParams *rp) {
     status |= receiveOne(rp);
   }
   while (
-    headerIsMultiFrame(&rp->headers.mmr, targetId) && status == HAL_OK
+    headerIsMultiFrame(rp->headers.mmr, targetId) && status == HAL_OK
   );
 
   return status;
@@ -77,9 +77,9 @@ static HalStatus receiveOne(ReceptionParams *rp) {
 }
 
 
-static always_inline bool headerIsMultiFrame(MmrCanHeader *header, CanId targetId) {
+static always_inline bool headerIsMultiFrame(MmrCanHeader header, CanId targetId) {
   return
     MMR_CAN_IsMultiFrame(header) &&
     !MMR_CAN_IsMultiFrameEnd(header) &&
-    header->senderId == targetId;
+    header.senderId == targetId;
 }

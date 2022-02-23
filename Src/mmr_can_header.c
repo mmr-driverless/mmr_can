@@ -26,10 +26,10 @@ bool MMR_CAN_IsHeaderScs(MmrCanHeader header) {
   return header.messageType == MMR_CAN_MESSAGE_TYPE_SCS;
 }
 
-bool MMR_CAN_IsMultiFrame(MmrCanHeader *header) {
-  return header->messageType == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
+bool MMR_CAN_IsMultiFrame(MmrCanHeader header) {
+  return header.messageType == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME;
 }
 
-bool MMR_CAN_IsMultiFrameEnd(MmrCanHeader *header) {
-  return header->messageType == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END;
+bool MMR_CAN_IsMultiFrameEnd(MmrCanHeader header) {
+  return header.messageType == MMR_CAN_MESSAGE_TYPE_MULTI_FRAME_END;
 }
