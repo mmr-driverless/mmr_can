@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "mmr_can_message_id.h"
 
+
 bool MMR_CAN_IsMessageIdOfType(
   MmrCanMessageId msgId,
   MmrCanMessageIdType type
