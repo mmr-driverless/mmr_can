@@ -62,8 +62,7 @@ HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
   static int counter = 0;
 
   MmrCanScsEntry *entry = &__scsEntries[counter];
-  counter++;
-  counter %= MMR_CAN_SCS_ENTRIES_COUNT;
+  ++counter %= MMR_CAN_SCS_ENTRIES_COUNT;
 
   if (MMR_CAN_HeaderToBits(entry->header) == 0) {
     return HAL_OK;
@@ -81,10 +80,8 @@ HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
 
 
 HalStatus sendScs(CanHandle *hcan, MmrCanHeader header) {
-  static CanMailbox scsMailbox = 0;
   MmrCanPacket packet = {
     .header = header,
-    .mailbox = &scsMailbox,
     .length = 0,
   };
 

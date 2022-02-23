@@ -91,15 +91,12 @@ typedef struct {
  * } Point;
  *
  * HalStatus send(Point point) {
- *   static CanMailbox mailbox = 0;
- *
  *   MmrCanPacket packet = {
  *     .header = {
  *       .priority = MMR_CAN_MESSAGE_PRIORITY_NORMAL,
  *       .messageId = MMR_CAN_EXAMPLES_POINT,
  *       .senderId = 0xXXX,
  *     },
- *     .mailbox = &mailbox,
  *     .data = (uint8_t*)&point,
  *     .length = sizeof(point),
  *   };
@@ -118,7 +115,6 @@ typedef struct {
  */
 typedef struct {
   MmrCanHeader header;
-  CanMailbox *mailbox;
   uint8_t *data;
   uint8_t length;
 } MmrCanPacket;
