@@ -61,8 +61,8 @@ HalStatus MMR_CAN_SendScs(
 HalStatus MMR_CAN_HandleNextScs(CanHandle *hcan) {
   static int counter = 0;
 
-  MmrCanScsEntry *entry = &__scsEntries[counter];
-  ++counter %= MMR_CAN_SCS_ENTRIES_COUNT;
+  MmrCanScsEntry *entry = &__scsEntries[counter++];
+  counter %= MMR_CAN_SCS_ENTRIES_COUNT;
 
   if (MMR_CAN_HeaderToBits(entry->header) == 0) {
     return HAL_OK;

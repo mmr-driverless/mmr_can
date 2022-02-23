@@ -17,7 +17,7 @@ typedef struct {
 
 static HalStatus receiveOne(ReceptionParams *rp);
 static HalStatus receiveAll(ReceptionParams *rp);
-static bool headerIsMultiFrame(MmrCanHeader *header, CanId targetId);
+static bool headerIsMultiFrame(MmrCanHeader header, CanId targetId);
 
 
 /**
@@ -77,7 +77,7 @@ static HalStatus receiveOne(ReceptionParams *rp) {
 }
 
 
-static always_inline bool headerIsMultiFrame(MmrCanHeader header, CanId targetId) {
+static bool headerIsMultiFrame(MmrCanHeader header, CanId targetId) {
   return
     MMR_CAN_IsMultiFrame(header) &&
     !MMR_CAN_IsMultiFrameEnd(header) &&
