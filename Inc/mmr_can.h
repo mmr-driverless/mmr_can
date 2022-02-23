@@ -192,10 +192,6 @@ HalStatus MMR_CAN_BasicSetupAndStart(CanHandle *hcan);
 /**
  * @brief
  * Configures the filters.
- * 
- * @param hcan The interface to use.
- * @param settings The settings to use when configuring the filters.
- * @return HalStatus The result of the operation.
  */
 HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings);
 
