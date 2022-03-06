@@ -27,7 +27,7 @@
  * 
  * Constants with lower values have an higher priority.
  */
-typedef enum {
+typedef enum MmrCanMessageType {
   MMR_CAN_MESSAGE_TYPE_SCS = B_(0000),
   MMR_CAN_MESSAGE_TYPE_ACK = B_(0001),
   MMR_CAN_MESSAGE_TYPE_MULTI_FRAME = B_(0010),
@@ -36,7 +36,7 @@ typedef enum {
 } MmrCanMessageType;
 
 
-typedef enum {
+typedef enum MmrCanMessagePriority {
   MMR_CAN_MESSAGE_PRIORITY_LOW = B_(0010),
   MMR_CAN_MESSAGE_PRIORITY_NORMAL = B_(0001),
   MMR_CAN_MESSAGE_PRIORITY_HIGH = B_(0000),
@@ -48,7 +48,7 @@ typedef enum {
  * This struct encodes the values stored inside the
  * extended id field of a CAN packet.
  */
-typedef struct {
+typedef struct MmrCanHeader {
   MmrCanMessagePriority priority : 3;
   uint16_t messageId : 10;
   uint16_t senderId : 10;

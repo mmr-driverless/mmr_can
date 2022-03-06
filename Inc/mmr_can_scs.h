@@ -44,7 +44,7 @@ typedef uint32_t TimerRange;
  * Represents the base-struct to manage a single RTR
  * and allows to interface with the associated SCS's timer
  */
-typedef struct {
+typedef struct MmrCanScsEntry {
   /**
    * @brief
    * The header used to index this entry.
@@ -74,7 +74,7 @@ typedef struct {
  * @brief
  * The results of an scsCheck operation.
  */
-typedef enum {
+typedef enum MmrCanScsCheckResult {
   /**
    * @brief No timeout error.
    */

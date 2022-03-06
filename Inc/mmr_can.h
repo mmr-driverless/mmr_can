@@ -46,7 +46,7 @@ typedef uint32_t (*MmrCanTickProvider)();
 typedef uint8_t CanRxBuffer[MMR_CAN_MAX_DATA_LENGTH];
 
 
-typedef struct {
+typedef struct MmrCanFilterSettings {
   bool enabled;
 
   /**
@@ -113,7 +113,7 @@ typedef struct {
  *   // 'p' has been sent.
  * }
  */
-typedef struct {
+typedef struct MmrCanPacket {
   MmrCanHeader header;
   uint8_t *data;
   uint8_t length;
@@ -154,7 +154,7 @@ typedef struct {
  *   // be used.
  * }
  */
-typedef struct {
+typedef struct MmrCanMessage {
   MmrCanHeader header;
   void *store;
 } MmrCanMessage;
