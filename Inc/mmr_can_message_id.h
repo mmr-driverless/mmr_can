@@ -27,14 +27,16 @@
  * 
  * Ids scheme:
  *
- *  id  | type | subtype
- * -----|------|---------
- *  SCS | 000  | xxxxxxx
+ *   id   | type | subtype
+ * -------|------|---------
+ *  SCS   | 000  | xxxxxxx
+ *  DRIVE | 001  | xxxxxxx
  */
 typedef enum MmrCanMessageId MmrCanMessageId;
 
 typedef enum {
   MMR_CAN_MESSAGE_ID_TYPE_SCS = 0,
+  MMR_CAN_MESSAGE_ID_TYPE_DRIVE = 1,
 } MmrCanMessageIdType;
 
 
@@ -90,6 +92,9 @@ enum MmrCanMessageId {
   MMR_CAN_MESSAGE_ID_SCS_AM_EBS_TEST,
   MMR_CAN_MESSAGE_ID_SCS_AM_INSPECTION = 0x17,
 // !SCS
+// DRIVE
+  MMR_CAN_MESSAGE_ID_DRIVE_STEERING_ANGLE = 0x8A,
+// !DRIVE
 };
 
 #endif // !INC_MMR_CAN_MESSAGE_ID_H_
