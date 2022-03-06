@@ -34,7 +34,7 @@
  */
 typedef enum MmrCanMessageId MmrCanMessageId;
 
-typedef enum {
+typedef enum MmrCanMessageIdType {
   MMR_CAN_MESSAGE_ID_TYPE_SCS = 0,
   MMR_CAN_MESSAGE_ID_TYPE_DRIVE = 1,
 } MmrCanMessageIdType;

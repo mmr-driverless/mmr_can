@@ -17,7 +17,7 @@
 
 typedef void (*MmrCanEventHandler)(const MmrCanMessage *event);
 
-typedef struct {
+typedef struct MmrCanEventList {
   const MmrCanEventHandler *handlers;
   const size_t count;
 } MmrCanEventList;
