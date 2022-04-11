@@ -11,9 +11,9 @@ bool MMR_CAN_IsMessageIdOfType(
 
 
 uint8_t MMR_CAN_GetMessageIdType(MmrCanMessageId msgId) {
-  return msgId >> 7;
+  return msgId >> 5;
 }
 
 uint8_t MMR_CAN_GetMessageIdSubtype(MmrCanMessageId msgId) {
-  return msgId & B8_(0111, 1111);
+  return msgId & B8_(0001, 1111);
 }
