@@ -20,14 +20,20 @@ static HalStatus receiveAll(ReceptionParams *rp);
 static bool headerIsMultiFrame(MmrCanHeader header, CanId targetId);
 
 
-/**
- * @brief
- * Reads a CAN message and stores it inside the
- * given MmrCanMessage struct.
- *
- * If a multi-frame message is received, this function will block
- * and read every frame for that particular message.
- */
+MmrResult MMR_CAN_TryReceive(CanHandle *hcan, MmrCanMessage *result) {
+  size_t pendingMessages =
+    HAL_CAN_GetRxFifoFillLevel(hcan, MMR_CAN_RX_FIFO);
+
+  if (pendingMessages > 0) {
+    return MMR_CAN_Receive(hcan, result) != HAL_OK
+      ? MMR_RESULT_COMPLETED
+      : MMR_RESULT_ERROR;
+  }
+
+  return MMR_RESULT_PENDING;
+}
+
+
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result) {
   ReceptionParams rp = {
     .handle = hcan,

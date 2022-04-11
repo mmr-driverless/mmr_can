@@ -73,11 +73,11 @@
  *
  * Asynchronous logic can be easily implemented using State Machines
  */
-typedef enum MmrAsyncResult {
-  MMR_ASYNC_RESULT_ERROR,
-  MMR_ASYNC_RESULT_PENDING,
-  MMR_ASYNC_RESULT_COMPLETED,
-} MmrAsyncResult;
+typedef enum MmrResult {
+  MMR_RESULT_ERROR,
+  MMR_RESULT_PENDING,
+  MMR_RESULT_COMPLETED,
+} MmrResult;
 
 
 #endif /* INC_MMR_CAN_UTIL_H_ */
