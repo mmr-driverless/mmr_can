@@ -10,6 +10,10 @@
  * MMR_CAN_MESSAGE_ID_POINT might be interpreted as
  * a message carrying a struct Point { int x; int y; };,
  * and thus deserialized accordingly.
+ *
+ * You can find a table with more in-depth explanations on
+ * Google Drive:
+ * https://docs.google.com/spreadsheets/d/1GIC0_FuhCjXfBOg_dUWzoEsl5TG7SEOR
  */
 
 #ifndef INC_MMR_CAN_MESSAGE_ID_H_
@@ -22,8 +26,8 @@
 /**
  * @brief
  * Message ids are 10 bits wide
- * The first 3 bits determine the message id type, while
- * the other 7 determine the subtype.
+ * The first 5 bits determine the message id type, while
+ * the other 5 determine the subtype.
  * 
  * Ids scheme:
  *
@@ -117,6 +121,7 @@ enum MmrCanMessageId {
 // !AUTONOMOUS_MISSION_CONTROL
 // DRIVE
   MMR_CAN_MESSAGE_ID_D_STEERING_ANGLE = 160,
+  MMR_CAN_MESSAGE_ID_D_BREAKING_PERCENTAGE,
 // !DRIVE
 // ECU_BOSCH
   MMR_CAN_MESSAGE_ID_ECU_BOSCH_ = 192,

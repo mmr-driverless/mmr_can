@@ -230,9 +230,20 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet);
  */
 HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet);
 
+
 /**
  * @brief
- * Receives a can message from the network.
+ * Tries to receive a message.
+ */
+MmrResult MMR_CAN_TryReceive(CanHandle *hcan, MmrCanMessage *result);
+
+/**
+ * @brief
+ * Reads a CAN message and stores it inside the
+ * given MmrCanMessage struct.
+ *
+ * If a multi-frame message is received, this function will block
+ * and read every frame for that particular message.
  */
 HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
 
