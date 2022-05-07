@@ -23,9 +23,13 @@ static uint8_t computeFramesToSend(MmrCanPacket *packet);
 static uint8_t computeNextMessageLength(MmrCanPacket *packet);
 static void setMessageType(TransmissionParams *header, MmrCanMessageType type);
 static void syncHeaders(TransmissionParams *tp);
+static CanMailbox *getNextMailbox();
 
 
-static CanMailbox __mailbox;
+#define MAILBOXES_COUNT 3
+
+static CanMailbox __mailboxes[MAILBOXES_COUNT] = {};
+static uint8_t __currentMailbox = 0;
 
 
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
@@ -108,8 +112,13 @@ static HalStatus send(TransmissionParams *tp) {
     tp->handle,
     &tp->headers.tx,
     tp->packet->data,
-    &__mailbox
+    getNextMailbox()
   );
+}
+
+
+static CanMailbox *getNextMailbox() {
+  return &__mailboxes[__currentMailbox++ % MAILBOXES_COUNT];
 }
 
 
