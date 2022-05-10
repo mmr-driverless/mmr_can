@@ -14,7 +14,7 @@ typedef struct {
 } TransmissionParams;
 
 
-static TransmissionParams buildParams(CanHandle *hcan, MmrCanPacket packet);
+static TransmissionParams buildParams(CanHandle *hcan, MmrCanPacket *packet);
 static HalStatus send(TransmissionParams *tp);
 static HalStatus sendNormal(TransmissionParams *tp);
 static HalStatus sendMulti(TransmissionParams *tp);
@@ -34,7 +34,7 @@ static uint8_t __currentMailbox = 0;
 
 HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp =
-    buildParams(hcan, packet);
+    buildParams(hcan, &packet);
 
   syncHeaders(&tp);
   return packet.length <= MMR_CAN_MAX_DATA_LENGTH
@@ -45,21 +45,21 @@ HalStatus MMR_CAN_Send(CanHandle *hcan, MmrCanPacket packet) {
 
 HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet) {
   TransmissionParams tp =
-    buildParams(hcan, packet);
+    buildParams(hcan, &packet);
 
   return send(&tp);
 }
 
 
-static TransmissionParams buildParams(CanHandle *hcan, MmrCanPacket packet) {
+static TransmissionParams buildParams(CanHandle *hcan, MmrCanPacket *packet) {
   return (TransmissionParams) {
     .handle = hcan,
-    .packet = &packet,
-    .headers.mmr = packet.header,
+    .packet = packet,
+    .headers.mmr = packet->header,
     .headers.tx = {
       .IDE = CAN_ID_EXT,
       .RTR = CAN_RTR_DATA,
-      .DLC = packet.length,
+      .DLC = packet->length,
       .TransmitGlobalTime = DISABLE,
     },
   };
