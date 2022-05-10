@@ -118,7 +118,10 @@ static HalStatus send(TransmissionParams *tp) {
 
 
 static CanMailbox *getNextMailbox() {
-  return &__mailboxes[__currentMailbox++ % MAILBOXES_COUNT];
+  __currentMailbox++;
+  __currentMailbox %= MAILBOXES_COUNT;
+
+  return __mailboxes + __currentMailbox;
 }
 
 
