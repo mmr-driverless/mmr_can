@@ -12,6 +12,7 @@
 
 typedef uint32_t CanId;
 typedef uint32_t CanMailbox;
+typedef uint32_t CanFifo;
 
 /**
  * @brief

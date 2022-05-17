@@ -46,6 +46,15 @@ typedef uint32_t (*MmrCanTickProvider)();
 typedef uint8_t CanRxBuffer[MMR_CAN_MAX_DATA_LENGTH];
 
 
+typedef struct MmrCan {
+  CanId id;
+  CanHandle *handle;
+  CanFifo fifo;
+  CanMailbox mailboxes[MAILBOXES_COUNT];
+  uint8_t currentMailbox;
+} MmrCan;
+
+
 typedef struct MmrCanFilterSettings {
   bool enabled;
 
@@ -115,7 +124,7 @@ typedef struct MmrCanFilterSettings {
  */
 typedef struct MmrCanPacket {
   MmrCanHeader header;
-  uint8_t *data;
+  void *data;
   uint8_t length;
 } MmrCanPacket;
 
@@ -171,6 +180,18 @@ typedef struct MmrCanMessage {
  * and acknowledgment. 
  */
 extern MmrCanTickProvider __mmr_can_tickProvider;
+
+
+
+MmrCan MMR_CAN_Create(CanHandle *hcan, CanFifo rxFifo);
+HalStatus MMR_CAN_Start(MmrCan *can);
+HalStatus MMR_CAN_EnableFilter(MmrCan *can, CanFilterMask mask, CanFilterBank bank);
+
+HalStatus MMR_CAN_SendString(MmrCan *can, MmrCanMessageId msgId, const char *data);
+HalStatus MMR_CAN_SendInt(MmrCan *can, MmrCanMessageId msgId, int data);
+HalStatus MMR_CAN_SendFloat(MmrCan *can, MmrCanMessageId msgId, float data);
+HalStatus MMR_CAN_SendRaw(MmrCan *can, MmrCanMessageId msgId, void *data, uint8_t length);
+HalStatus MMR_CAN_SendPacket(MmrCan *can, MmrCanPacket packet);
 
 
 /**
@@ -235,7 +256,7 @@ HalStatus MMR_CAN_SendNoTamper(CanHandle *hcan, MmrCanPacket packet);
  * @brief
  * Tries to receive a message.
  */
-MmrResult MMR_CAN_TryReceive(CanHandle *hcan, MmrCanMessage *result);
+MmrResult MMR_CAN_TryReceive(MmrCan *can, MmrCanMessage *result);
 
 /**
  * @brief
@@ -245,6 +266,6 @@ MmrResult MMR_CAN_TryReceive(CanHandle *hcan, MmrCanMessage *result);
  * If a multi-frame message is received, this function will block
  * and read every frame for that particular message.
  */
-HalStatus MMR_CAN_Receive(CanHandle *hcan, MmrCanMessage *result);
+HalStatus MMR_CAN_Receive(MmrCan *can, MmrCanMessage *result);
 
 #endif /* INC_MMR_CAN_H_ */
