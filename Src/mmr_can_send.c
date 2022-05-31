@@ -5,6 +5,7 @@
 #define MAILBOXES_COUNT 3
 
 static MmrCanHeader buildDefaultHeader(MmrCan *can, MmrCanMessageId msgId);
+static CanTxHeader buildTxHeader(MmrCan *can, MmrCanPacket *packet);
 static CanMailbox *getNextMailbox(MmrCan *can);
 
 
@@ -15,9 +16,11 @@ HalStatus MMR_CAN_SendString(MmrCan *can, MmrCanMessageId msgId, const char *dat
   return MMR_CAN_SendRaw(can, msgId, &data, len);
 }
 
+
 HalStatus MMR_CAN_SendInt(MmrCan *can, MmrCanMessageId msgId, int data) {
   return MMR_CAN_SendRaw(can, msgId, &data, sizeof(data))
 }
+
 
 HalStatus MMR_CAN_SendFloat(MmrCan *can, MmrCanMessageId msgId, float data) {
   return MMR_CAN_SendRaw(can, msgId, &data, sizeof(data));
@@ -39,13 +42,8 @@ HalStatus MMR_CAN_SendRaw(
 
 
 HalStatus MMR_CAN_SendPacket(MmrCan *can, MmrCanPacket packet) {
-  CanTxHeader txHeader = {
-    .ExtId = MMR_CAN_HeaderToBits(packet.header),
-    .IDE = CAN_ID_EXT,
-    .RTR = CAN_RTR_DATA,
-    .DLC = packet->length,
-    .TransmitGlobalTime = DISABLE,
-  };
+  CanTxHeader txHeader =
+    buildTxHeader(can, &packet);
 
   return HAL_CAN_AddTxMessage(
     can->handle,
@@ -56,12 +54,23 @@ HalStatus MMR_CAN_SendPacket(MmrCan *can, MmrCanPacket packet) {
 }
 
 
-MmrCanHeader buildDefaultHeader(MmrCan *can, MmrCanMessageId msgId) {
+static MmrCanHeader buildDefaultHeader(MmrCan *can, MmrCanMessageId msgId) {
   return (MmrCanHeader){
     .messageId = msgId,
     .senderId = can->id,
     .priority = MMR_CAN_MESSAGE_PRIORITY_NORMAL,
     .messageType = MMR_CAN_MESSAGE_TYPE_NORMAL,
+  };
+}
+
+
+static CanTxHeader buildTxHeader(MmrCan *can, MmrCanPacket *packet) {
+  return (CanTxHeader){
+    .ExtId = MMR_CAN_HeaderToBits(packet->header),
+    .IDE = CAN_ID_EXT,
+    .RTR = CAN_RTR_DATA,
+    .DLC = packet->length,
+    .TransmitGlobalTime = DISABLE,
   };
 }
 

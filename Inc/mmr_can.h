@@ -194,6 +194,10 @@ HalStatus MMR_CAN_SendRaw(MmrCan *can, MmrCanMessageId msgId, void *data, uint8_
 HalStatus MMR_CAN_SendPacket(MmrCan *can, MmrCanPacket packet);
 
 
+#define MMR_CAN_SendStruct(pcan, messageId, pdata) \
+  MMR_CAN_SendRaw(pcan, messageId, pdata, sizeof(*pdata))
+
+
 /**
  * @brief
  * Sets the tick provider.
@@ -229,6 +233,14 @@ HalStatus MMR_CAN_FilterConfig(CanHandle *hcan, MmrCanFilterSettings settings);
  * the filters. 
  */
 MmrCanFilterSettings MMR_CAN_GetDefaultFilterSettings();
+
+
+HalStatus MMR_CAN_SendString(MmrCan *can, MmrCanMessageId msgId, const char *data);
+HalStatus MMR_CAN_SendInt(MmrCan *can, MmrCanMessageId msgId, int data);
+HalStatus MMR_CAN_SendFloat(MmrCan *can, MmrCanMessageId msgId, float data);
+HalStatus MMR_CAN_SendRaw(MmrCan *can, MmrCanMessageId msgId, void *data, uint8_t length);
+HalStatus MMR_CAN_SendPacket(MmrCan *can, MmrCanPacket packet);
+
 
 /**
  * @brief
